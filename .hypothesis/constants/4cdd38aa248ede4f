@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/.venv/bin/pytest
+# hypothesis_version: 6.148.9
+
+['-script.pyw', '.exe', '__main__']

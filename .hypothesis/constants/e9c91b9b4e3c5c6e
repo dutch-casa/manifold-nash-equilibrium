@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/primitives/__init__.py
+# hypothesis_version: 6.148.9
+
+['StridedConv1d', 'apply_rope', 'apply_rope_per_scale', 'compute_rope_freqs', 'convex_aggregation', 'nash_best_response', 'nearest_upsample', 'sinkhorn_knopp']

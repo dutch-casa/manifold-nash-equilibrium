@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/types/__init__.py
+# hypothesis_version: 6.148.9
+
+['AttentionWeights', 'BoundedResidual', 'DoublyStochastic', 'ModelConfig', 'SimplexWeights', 'TrainingConfig', 'assert_simplex']

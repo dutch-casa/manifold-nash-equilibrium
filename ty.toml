@@ -1,0 +1,12 @@
+[environment]
+python-version = "3.11"
+
+[rules]
+strict = true
+
+[rules.lint]
+# Enforce type annotations on all public APIs
+untyped-def = "error"
+possibly-unbound = "error"
+redundant-cast = "warn"
+unused-ignore = "warn"

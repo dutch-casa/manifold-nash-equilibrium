@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/primitives/strided_conv.py
+# hypothesis_version: 6.148.9
+
+[-2.0, 1.0, 2.0, 127, 128, 'B N D', 'B N2 D', 'NCH', 'OIH', 'out_c', 'out_c in_c k']

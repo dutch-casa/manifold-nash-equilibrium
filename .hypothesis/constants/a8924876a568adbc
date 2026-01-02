@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/primitives/rope.py
+# hypothesis_version: 6.148.9
+
+[1.0, 10000.0, 'B N H K', 'M K2', 'N D2', 'N K2', 'compression_ratio', 'scale_idx']

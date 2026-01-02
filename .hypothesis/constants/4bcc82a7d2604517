@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/primitives/upsample.py
+# hypothesis_version: 6.148.9
+
+['B L N D', 'B N D', 'B N_l D', 'B target_len D']

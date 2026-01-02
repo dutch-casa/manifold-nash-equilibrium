@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<title>Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models</title>
+<!--Generated on Thu Dec 18 14:12:19 2025 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<link href="/static/browse/0.3.4/css/arxiv-html-papers-20250916.css" rel="stylesheet" type="text/css"/>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
+<script src="/static/browse/0.3.4/js/addons_new.js"></script>
+<script src="/static/browse/0.3.4/js/feedbackOverlay.js"></script>
+<base href="/html/2512.14925v2/"/></head>
+<body>
+<nav class="ltx_page_navbar">
+<nav class="ltx_TOC">
+<ol class="ltx_toclist">
+<li class="ltx_tocentry ltx_tocentry_section"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S1" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">I </span><span class="ltx_text ltx_font_smallcaps">Introduction</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S2" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">II </span><span class="ltx_text ltx_font_smallcaps">Related Work</span></span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S2.SS1" title="In II Related Work ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">II-A</span> </span><span class="ltx_text ltx_font_italic">Sparse Attention Mechanisms</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S2.SS2" title="In II Related Work ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">II-B</span> </span><span class="ltx_text ltx_font_italic">Hierarchical Attention Frameworks</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S2.SS3" title="In II Related Work ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">II-C</span> </span><span class="ltx_text ltx_font_italic">Optimization-Driven and Game-Theoretic Aggregation</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S2.SS4" title="In II Related Work ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">II-D</span> </span><span class="ltx_text ltx_font_italic">Multiscale Analysis in Language Models</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S2.SS5" title="In II Related Work ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">II-E</span> </span><span class="ltx_text ltx_font_italic">Integration of Optimization and Attention</span></span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S3" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">III </span><span class="ltx_text ltx_font_smallcaps">Preliminaries and Background</span></span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S3.SS1" title="In III Preliminaries and Background ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">III-A</span> </span><span class="ltx_text ltx_font_italic">Attention Mechanisms in Transformers</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S3.SS2" title="In III Preliminaries and Background ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">III-B</span> </span><span class="ltx_text ltx_font_italic">Multiscale Signal Decomposition</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S3.SS3" title="In III Preliminaries and Background ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">III-C</span> </span><span class="ltx_text ltx_font_italic">Game-Theoretic Optimization</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S3.SS4" title="In III Preliminaries and Background ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">III-D</span> </span><span class="ltx_text ltx_font_italic">Convex Optimization in Attention</span></span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">IV </span><span class="ltx_text ltx_font_smallcaps">The MAHA Framework</span></span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4.SS1" title="In IV The MAHA Framework ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">IV-A</span> </span><span class="ltx_text ltx_font_italic">Hierarchical Multiscale Decomposition with Learnable Downsampling</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4.SS2" title="In IV The MAHA Framework ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">IV-B</span> </span><span class="ltx_text ltx_font_italic">Multiscale Attention Computation</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4.SS3" title="In IV The MAHA Framework ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">IV-C</span> </span><span class="ltx_text ltx_font_italic">Aggregation of Multiscale Attention Outputs</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4.SS4" title="In IV The MAHA Framework ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">IV-D</span> </span><span class="ltx_text ltx_font_italic">Hybrid Dilated-Convolutional Transformer Design</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4.SS5" title="In IV The MAHA Framework ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">IV-E</span> </span><span class="ltx_text ltx_font_italic">Complexity Reduction through Hierarchical Sparsity</span></span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">V </span><span class="ltx_text ltx_font_smallcaps">Experiments</span></span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS1" title="In V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-A</span> </span><span class="ltx_text ltx_font_italic">Experimental Setup</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS2" title="In V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-B</span> </span><span class="ltx_text ltx_font_italic">Main Results</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS3" title="In V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-C</span> </span><span class="ltx_text ltx_font_italic">Computational Efficiency Analysis</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection">
+<a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS4" title="In V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-D</span> </span><span class="ltx_text ltx_font_italic">Ablation Studies</span></span></a>
+<ol class="ltx_toclist ltx_toclist_subsection">
+<li class="ltx_tocentry ltx_tocentry_subsubsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS4.SSS1" title="In V-D Ablation Studies ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-D</span>1 </span>Aggregation Strategy Comparison</span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsubsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS4.SSS2" title="In V-D Ablation Studies ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-D</span>2 </span>Scale Configuration Analysis</span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.SS5" title="In V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">V-E</span> </span><span class="ltx_text ltx_font_italic">Qualitative Analysis</span></span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section">
+<a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S6" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">VI </span><span class="ltx_text ltx_font_smallcaps">Discussion</span></span></a>
+<ol class="ltx_toclist ltx_toclist_section">
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S6.SS1" title="In VI Discussion ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">VI-A</span> </span><span class="ltx_text ltx_font_italic">Scalability vs. Implementation Overhead</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S6.SS2" title="In VI Discussion ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">VI-B</span> </span><span class="ltx_text ltx_font_italic">Limitations</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S6.SS3" title="In VI Discussion ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">VI-C</span> </span><span class="ltx_text ltx_font_italic">Potential Application Scenarios</span></span></a></li>
+<li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S6.SS4" title="In VI Discussion ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref"><span class="ltx_text">VI-D</span> </span><span class="ltx_text ltx_font_italic">Ethical Considerations</span></span></a></li>
+</ol>
+</li>
+<li class="ltx_tocentry ltx_tocentry_section"><a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S7" title="In Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_title"><span class="ltx_tag ltx_tag_ref">VII </span><span class="ltx_text ltx_font_smallcaps">Conclusion</span></span></a></li>
+</ol></nav>
+</nav>
+<div class="ltx_page_main">
+<div class="ltx_page_content">
+<article class="ltx_document ltx_authors_1line">
+<h1 class="ltx_title ltx_title_document">Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models</h1>
+<div class="ltx_authors">
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Caner Erden
+</span><span class="ltx_author_notes">This work was supported in part by Sakarya University of Applied Sciences. (Corresponding author: Caner Erden)C. Erden is with the Department of Computer Engineering, Faculty of Technology, Sakarya University of Applied Science, Sakarya, Türkiye (e-mail: cerden@subu.edu.tr; ORCID: 0000-0002-7311-862X).Data Availability: The source code is available at https://github.com/canererden/MAHA-Project (arXiv: https://arxiv.org/abs/2512.14925).</span></span>
+</div>
+<div class="ltx_abstract">
+<h6 class="ltx_title ltx_title_abstract">Abstract</h6>
+<p class="ltx_p" id="id1.id1">The quadratic computational complexity of Multi-Head Self-Attention (MHSA) remains a fundamental bottleneck in scaling Large Language Models (LLMs) for long-context tasks. While sparse and linearized attention mechanisms attempt to mitigate this, they often compromise the representation of global dependencies or fail to capture multiscale semantic granularity effectively. In this paper, we propose Multiscale Aggregated Hierarchical Attention (MAHA), a novel architectural framework that reformulates the attention mechanism through hierarchical decomposition and mathematically rigorous aggregation. Unlike conventional approaches that treat token interactions at a single resolution, MAHA dynamically partitions the input sequence into hierarchical scales via learnable downsampling operators. The core innovation lies in its aggregation strategy: we model the fusion of scale-specific attention matrices as a resource allocation problem, solved via a convex optimization framework or a Nash equilibrium-based game-theoretic approach. This ensures a theoretically optimal balance between local nuance and global context fidelity. Implemented within a hybrid dilated-convolutional transformer backbone, MAHA utilizes differentiable optimization layers to enable end-to-end training. Experimental evaluations demonstrate that MAHA achieves superior scalability; empirical FLOPs analysis confirms an 81% reduction in computational cost at a sequence length of 4096 compared to standard attention. This work bridges the gap between optimization theory and sequence modeling, offering a scalable solution for next-generation LLMs.</p>
+<p class="ltx_p" id="id2.id2"><span class="ltx_text ltx_font_bold" id="id2.id2.1">Keywords:</span> Large Language Models, Hierarchical Attention, Game Theory, Convex Optimization, Nash Equilibrium, Efficient Transformers.</p>
+</div>
+<section class="ltx_section" id="S1">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">I </span><span class="ltx_text ltx_font_smallcaps" id="S1.1.1">Introduction</span>
+</h2>
+<div class="ltx_para" id="S1.p1">
+<p class="ltx_p" id="S1.p1.1">The advent of transformer-based architectures has fundamentally revolutionized natural language processing (NLP), establishing the Multi-Head Self-Attention (MHSA) mechanism as the cornerstone of modern large language models (LLMs) <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">vaswani2017a</span>]</cite>. Despite its efficacy, this mechanism confronts two critical challenges: (i) computational inefficiency arising from quadratic complexity (<math alttext="O(N^{2})" class="ltx_Math" display="inline" id="S1.p1.1.m1" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msup><mi>N</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(N^{2})</annotation></semantics></math>) with respect to sequence length, and (ii) the inherent trade-off between capturing fine-grained local patterns and coarse-grained global dependencies simultaneously. These limitations become increasingly pronounced as LLMs scale to process extended contexts and model complex linguistic structures <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">zhao2023a</span>]</cite>.</p>
+</div>
+<div class="ltx_para" id="S1.p2">
+<p class="ltx_p" id="S1.p2.1">Current methodologies attempting to mitigate these challenges typically rely on sparse attention patterns or hierarchical representations. Sparse attention strategies alleviate computational overhead by restricting token interactions to predefined or learned patterns; however, this often results in information loss and suboptimal context modeling, particularly for long-range dependencies <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">yang2016a</span>]</cite>. Conversely, hierarchical methods decompose the input into multiple levels of granularity but frequently lack a principled mathematical framework for integration. This often leads to ad-hoc aggregation schemes that fail to preserve the full contextual richness of the input embedding space <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">starck2015a</span>]</cite>.</p>
+</div>
+<div class="ltx_para" id="S1.p3">
+<p class="ltx_p" id="S1.p3.1">To bridge this gap, we introduce Multiscale Aggregated Hierarchical Attention (MAHA), a novel framework that addresses these limitations through a mathematically rigorous approach to multiscale attention computation and aggregation. MAHA dynamically partitions the input sequence into hierarchical scales, where each scale represents a distinct level of contextual abstraction. Distinguishing itself from prior hierarchical approaches, MAHA leverages convex optimization (CO) or game-theoretic equilibrium to synthesize these scales. This ensures that the aggregation process is not merely a weighted average but an optimization problem that balances efficiency and contextual awareness. Consequently, the proposed method provides a systematic mechanism to reconcile local nuances with global dependencies while maintaining computational tractability.</p>
+</div>
+<div class="ltx_para" id="S1.p4">
+<p class="ltx_p" id="S1.p4.1">The primary contributions of this work are threefold:</p>
+<ul class="ltx_itemize" id="S1.I1">
+<li class="ltx_item" id="S1.I1.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S1.I1.i1.p1">
+<p class="ltx_p" id="S1.I1.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S1.I1.i1.p1.1.1">Multiscale Decomposition:</span> We introduce a robust decomposition strategy where the input sequence is processed across independent scales to isolate and capture distinct levels of contextual granularity.</p>
+</div>
+</li>
+<li class="ltx_item" id="S1.I1.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S1.I1.i2.p1">
+<p class="ltx_p" id="S1.I1.i2.p1.1"><span class="ltx_text ltx_font_bold" id="S1.I1.i2.p1.1.1">Optimization-Driven Aggregation:</span> We propose a novel aggregation mechanism governed by convex optimization and game-theoretic principles. This allows the model to determine the optimal trade-off between local and global context dynamically, rather than relying on static or heuristic fusion methods.</p>
+</div>
+</li>
+<li class="ltx_item" id="S1.I1.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S1.I1.i3.p1">
+<p class="ltx_p" id="S1.I1.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S1.I1.i3.p1.1.1">Computational Efficiency:</span> MAHA significantly reduces the quadratic complexity characteristic of standard attention mechanisms, enhancing scalability without compromising the model’s expressive power.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="ltx_para" id="S1.p5">
+<p class="ltx_p" id="S1.p5.1">MAHA is particularly pertinent to the evolution of LLMs, where the demand for efficient and scalable attention mechanisms is paramount <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">naveed2025a</span>]</cite>. By integrating rigorous multiscale analysis with optimization-based aggregation rules, MAHA offers a versatile solution adaptable to various transformer-based architectures with minimal architectural overhead. The framework is designed for compatibility with existing LLM training pipelines, ensuring practicality for real-world deployment.</p>
+</div>
+</section>
+<section class="ltx_section" id="S2">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">II </span><span class="ltx_text ltx_font_smallcaps" id="S2.1.1">Related Work</span>
+</h2>
+<div class="ltx_para" id="S2.p1">
+<p class="ltx_p" id="S2.p1.1">The development of efficient attention mechanisms has become a focal point in transformer-based architecture research, with numerous approaches proposed to alleviate computational bottlenecks and enhance contextual modeling capabilities. Existing literature can be broadly categorized into sparse attention methods, hierarchical attention frameworks, and optimization-driven aggregation techniques.</p>
+</div>
+<section class="ltx_subsection" id="S2.SS1">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S2.SS1.5.1.1">II-A</span> </span><span class="ltx_text ltx_font_italic" id="S2.SS1.6.2">Sparse Attention Mechanisms</span>
+</h3>
+<div class="ltx_para" id="S2.SS1.p1">
+<p class="ltx_p" id="S2.SS1.p1.2">Sparse attention mechanisms aim to reduce computational overhead by limiting token interactions to predefined or learned patterns. For instance, <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">beltagy2020a</span>]</cite> introduced a sliding window attention mechanism that restricts each token’s receptive field to its local neighborhood, significantly lowering memory requirements from <math alttext="O(n^{2})" class="ltx_Math" display="inline" id="S2.SS1.p1.1.m1" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n^{2})</annotation></semantics></math> to <math alttext="O(n)" class="ltx_Math" display="inline" id="S2.SS1.p1.2.m2" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math> for long sequences. Similarly, <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">zaheer2020a</span>]</cite> proposed a hybrid approach combining local, global, and random attention patterns to approximate full self-attention while maintaining theoretical expressiveness. However, these methods often rely on heuristics to determine sparsity patterns, which may not adapt dynamically to diverse input structures or capture long-range dependencies effectively without stacking multiple layers.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S2.SS2">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S2.SS2.5.1.1">II-B</span> </span><span class="ltx_text ltx_font_italic" id="S2.SS2.6.2">Hierarchical Attention Frameworks</span>
+</h3>
+<div class="ltx_para" id="S2.SS2.p1">
+<p class="ltx_p" id="S2.SS2.p1.1">Hierarchical approaches decompose input sequences into multiple levels of granularity to capture both local syntactic features and global semantic dependencies simultaneously. The Hierarchical Attention Network (HAN) <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">yang2016a</span>]</cite> processes documents at word and sentence levels, aggregating information through learned attention weights. More recently, <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">cheng2023a</span>]</cite> introduced a hierarchical attention mechanism (hi-attention) that integrates inter-layer information to improve sequence modeling. While effective, these methods typically employ fixed or ad-hoc aggregation rules—such as weighted averaging—which may not optimally balance the contributions from different scales, leading to information dilution.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S2.SS3">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S2.SS3.5.1.1">II-C</span> </span><span class="ltx_text ltx_font_italic" id="S2.SS3.6.2">Optimization-Driven and Game-Theoretic Aggregation</span>
+</h3>
+<div class="ltx_para" id="S2.SS3.p1">
+<p class="ltx_p" id="S2.SS3.p1.1">Optimization techniques have been increasingly integrated into neural architectures to enhance efficiency and robustness. For example, <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">jun2023a</span>]</cite> utilized hierarchical decomposition to interpret intermediate CNN decisions, demonstrating the potential of optimization-based feature integration. In the context of sequence modeling, <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">zhu2021a</span>]</cite> explored multi-head self-attention with hierarchical aggregation but did not incorporate rigorous convex optimization or game-theoretic principles. Game theory, particularly the concept of Nash equilibrium, has been successfully employed in multi-agent systems to resolve conflicts <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">lee2023a</span>]</cite>. Its application to attention mechanisms offers a principled pathway to resolve conflicts between competing attention scales, a direction that remains largely unexplored in current LLM architectures.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S2.SS4">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S2.SS4.5.1.1">II-D</span> </span><span class="ltx_text ltx_font_italic" id="S2.SS4.6.2">Multiscale Analysis in Language Models</span>
+</h3>
+<div class="ltx_para" id="S2.SS4.p1">
+<p class="ltx_p" id="S2.SS4.p1.1">Multiscale analysis is a staple in signal processing and computer vision <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">starck2015a</span>]</cite>, yet its direct application to language modeling remains limited. Recent work by <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">lu2023a</span>]</cite> demonstrated the effectiveness of hierarchical decomposition in graph convolutional networks, suggesting potential benefits for attention mechanisms. Similarly, <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">farge1992a</span>]</cite> proposed hierarchical decomposition for continual learning, highlighting the importance of scale-specific feature extraction. These studies provide empirical evidence that processing information at varying resolutions can enhance representation learning.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S2.SS5">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S2.SS5.5.1.1">II-E</span> </span><span class="ltx_text ltx_font_italic" id="S2.SS5.6.2">Integration of Optimization and Attention</span>
+</h3>
+<div class="ltx_para" id="S2.SS5.p1">
+<p class="ltx_p" id="S2.SS5.p1.1">The integration of differentiable optimization layers with attention mechanisms represents an emerging research frontier. While <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">lu2023a</span>]</cite> applied hierarchical attention to fraud detection, their aggregation method lacked strong theoretical guarantees. In contrast, the proposed MAHA framework distinguishes itself by unifying multiscale decomposition with rigorous aggregation rules. Unlike sparse attention methods, MAHA dynamically adjusts the scale of token interactions without relying on predefined patterns. Compared to existing hierarchical approaches, it employs convex optimization or Nash equilibrium (NE) to optimally combine attention scores. This combination enables MAHA to achieve superior computational efficiency and contextual modeling, addressing the key limitations of heuristic-based aggregation.</p>
+</div>
+</section>
+</section>
+<section class="ltx_section" id="S3">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">III </span><span class="ltx_text ltx_font_smallcaps" id="S3.1.1">Preliminaries and Background</span>
+</h2>
+<div class="ltx_para" id="S3.p1">
+<p class="ltx_p" id="S3.p1.1">To establish the theoretical foundation for MAHA, we briefly review key concepts in attention mechanisms, multiscale analysis, and game-theoretic optimization. These components form the basis of our proposed framework.</p>
+</div>
+<section class="ltx_subsection" id="S3.SS1">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S3.SS1.5.1.1">III-A</span> </span><span class="ltx_text ltx_font_italic" id="S3.SS1.6.2">Attention Mechanisms in Transformers</span>
+</h3>
+<div class="ltx_para" id="S3.SS1.p1">
+<p class="ltx_p" id="S3.SS1.p1.4">The standard attention mechanism in transformers computes pairwise interactions between all tokens in a sequence through scaled dot-product operations <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">vaswani2017a</span>]</cite>. Given an input sequence <math alttext="\mathbf{X}\in\mathbb{R}^{n\times d}" class="ltx_Math" display="inline" id="S3.SS1.p1.1.m1" intent=":literal"><semantics><mrow><mi>𝐗</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>n</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mi>d</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{X}\in\mathbb{R}^{n\times d}</annotation></semantics></math>, where <math alttext="n" class="ltx_Math" display="inline" id="S3.SS1.p1.2.m2" intent=":literal"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math> is the sequence length and <math alttext="d" class="ltx_Math" display="inline" id="S3.SS1.p1.3.m3" intent=":literal"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math> is the embedding dimension, the attention matrix <math alttext="\mathbf{A}" class="ltx_Math" display="inline" id="S3.SS1.p1.4.m4" intent=":literal"><semantics><mi>𝐀</mi><annotation encoding="application/x-tex">\mathbf{A}</annotation></semantics></math> is computed as:</p>
+</div>
+<div class="ltx_para" id="S3.SS1.p2">
+<table class="ltx_equation ltx_eqn_table" id="S3.E1">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{A}=\text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^{T}}{\sqrt{d_{k}}}\right)" class="ltx_Math" display="block" id="S3.E1.m1" intent=":literal"><semantics><mrow><mi>𝐀</mi><mo>=</mo><mrow><mtext>softmax</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo>(</mo><mfrac><msup><mi>𝐐𝐊</mi><mi>T</mi></msup><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mfrac><mo>)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathbf{A}=\text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^{T}}{\sqrt{d_{k}}}\right)</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(1)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S3.SS1.p3">
+<p class="ltx_p" id="S3.SS1.p3.3">where <math alttext="\mathbf{Q},\mathbf{K}\in\mathbb{R}^{n\times d_{k}}" class="ltx_Math" display="inline" id="S3.SS1.p3.1.m1" intent=":literal"><semantics><mrow><mrow><mi>𝐐</mi><mo>,</mo><mi>𝐊</mi></mrow><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>n</mi><mo lspace="0.222em" rspace="0.222em">×</mo><msub><mi>d</mi><mi>k</mi></msub></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{Q},\mathbf{K}\in\mathbb{R}^{n\times d_{k}}</annotation></semantics></math> are the query and key matrices, respectively, and <math alttext="d_{k}" class="ltx_Math" display="inline" id="S3.SS1.p3.2.m2" intent=":literal"><semantics><msub><mi>d</mi><mi>k</mi></msub><annotation encoding="application/x-tex">d_{k}</annotation></semantics></math> is the dimension of the keys. While effective, this operation exhibits quadratic complexity <math alttext="O(n^{2})" class="ltx_Math" display="inline" id="S3.SS1.p3.3.m3" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(n^{2})</annotation></semantics></math> in both computation and memory, rendering it impractical for very long sequences <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">zhao2023a</span>]</cite>.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S3.SS2">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S3.SS2.5.1.1">III-B</span> </span><span class="ltx_text ltx_font_italic" id="S3.SS2.6.2">Multiscale Signal Decomposition</span>
+</h3>
+<div class="ltx_para" id="S3.SS2.p1">
+<p class="ltx_p" id="S3.SS2.p1.1">Multiscale analysis provides a rigorous framework for examining signals at varying levels of resolution. In NLP, this translates to capturing both local syntactic patterns (high frequency) and global semantic structures (low frequency) <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">starck2015a</span>]</cite>. Inspired by wavelet transforms and pyramid decomposition <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">farge1992a</span>]</cite>, for a discrete signal representation <math alttext="\mathbf{x}" class="ltx_Math" display="inline" id="S3.SS2.p1.1.m1" intent=":literal"><semantics><mi>𝐱</mi><annotation encoding="application/x-tex">\mathbf{x}</annotation></semantics></math>, a multiscale decomposition can be expressed as:</p>
+</div>
+<div class="ltx_para" id="S3.SS2.p2">
+<table class="ltx_equation ltx_eqn_table" id="S3.E2">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{x}=\sum_{s=1}^{S}\mathcal{D}_{s}(\mathbf{x})+\mathcal{R}(\mathbf{x})" class="ltx_Math" display="block" id="S3.E2.m1" intent=":literal"><semantics><mrow><mi>𝐱</mi><mo rspace="0.111em">=</mo><mrow><mrow><munderover><mo movablelimits="false">∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><mrow><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>s</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝐱</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi class="ltx_font_mathcaligraphic">ℛ</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝐱</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathbf{x}=\sum_{s=1}^{S}\mathcal{D}_{s}(\mathbf{x})+\mathcal{R}(\mathbf{x})</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(2)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S3.SS2.p3">
+<p class="ltx_p" id="S3.SS2.p3.3">where <math alttext="\mathcal{D}_{s}" class="ltx_Math" display="inline" id="S3.SS2.p3.1.m1" intent=":literal"><semantics><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\mathcal{D}_{s}</annotation></semantics></math> represents the detail component at scale <math alttext="s" class="ltx_Math" display="inline" id="S3.SS2.p3.2.m2" intent=":literal"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>, and <math alttext="\mathcal{R}" class="ltx_Math" display="inline" id="S3.SS2.p3.3.m3" intent=":literal"><semantics><mi class="ltx_font_mathcaligraphic">ℛ</mi><annotation encoding="application/x-tex">\mathcal{R}</annotation></semantics></math> denotes the residual (coarse) component. This decomposition forms the structural basis for MAHA’s hierarchical processing layers.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S3.SS3">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S3.SS3.5.1.1">III-C</span> </span><span class="ltx_text ltx_font_italic" id="S3.SS3.6.2">Game-Theoretic Optimization</span>
+</h3>
+<div class="ltx_para" id="S3.SS3.p1">
+<p class="ltx_p" id="S3.SS3.p1.4">Game theory provides mathematical tools for modeling interactions between multiple decision-makers. The concept of Nash equilibrium <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">nash2024a</span>]</cite> is particularly relevant for MAHA’s aggregation phase, where different attention scales can be modeled as “players” competing for influence in the final representation. Given a game with <math alttext="N" class="ltx_Math" display="inline" id="S3.SS3.p1.1.m1" intent=":literal"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math> players and strategy sets <math alttext="S_{i}" class="ltx_Math" display="inline" id="S3.SS3.p1.2.m2" intent=":literal"><semantics><msub><mi>S</mi><mi>i</mi></msub><annotation encoding="application/x-tex">S_{i}</annotation></semantics></math>, a Nash equilibrium is a strategy profile <math alttext="s^{*}=(s_{1}^{*},\dots,s_{N}^{*})" class="ltx_Math" display="inline" id="S3.SS3.p1.3.m3" intent=":literal"><semantics><mrow><msup><mi>s</mi><mo>∗</mo></msup><mo>=</mo><mrow><mo stretchy="false">(</mo><msubsup><mi>s</mi><mn>1</mn><mo>∗</mo></msubsup><mo>,</mo><mi mathvariant="normal">…</mi><mo>,</mo><msubsup><mi>s</mi><mi>N</mi><mo>∗</mo></msubsup><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">s^{*}=(s_{1}^{*},\dots,s_{N}^{*})</annotation></semantics></math> such that for every player <math alttext="i" class="ltx_Math" display="inline" id="S3.SS3.p1.4.m4" intent=":literal"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>:</p>
+</div>
+<div class="ltx_para" id="S3.SS3.p2">
+<table class="ltx_equation ltx_eqn_table" id="S3.E3">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="u_{i}(s_{i}^{*},s_{-i}^{*})\geq u_{i}(s_{i},s_{-i}^{*})\quad\forall s_{i}\in S_{i}" class="ltx_Math" display="block" id="S3.E3.m1" intent=":literal"><semantics><mrow><mrow><mrow><msub><mi>u</mi><mi>i</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msubsup><mi>s</mi><mi>i</mi><mo>∗</mo></msubsup><mo>,</mo><msubsup><mi>s</mi><mrow><mo>−</mo><mi>i</mi></mrow><mo>∗</mo></msubsup><mo stretchy="false">)</mo></mrow></mrow><mo>≥</mo><mrow><msub><mi>u</mi><mi>i</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>s</mi><mi>i</mi></msub><mo>,</mo><msubsup><mi>s</mi><mrow><mo>−</mo><mi>i</mi></mrow><mo>∗</mo></msubsup><mo stretchy="false">)</mo></mrow></mrow></mrow><mspace style="width:1.167em;" width="1.167em"></mspace><mrow><mrow><mo rspace="0.167em">∀</mo><msub><mi>s</mi><mi>i</mi></msub></mrow><mo>∈</mo><msub><mi>S</mi><mi>i</mi></msub></mrow></mrow><annotation encoding="application/x-tex">u_{i}(s_{i}^{*},s_{-i}^{*})\geq u_{i}(s_{i},s_{-i}^{*})\quad\forall s_{i}\in S_{i}</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(3)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S3.SS3.p3">
+<p class="ltx_p" id="S3.SS3.p3.3">where <math alttext="u_{i}" class="ltx_Math" display="inline" id="S3.SS3.p3.1.m1" intent=":literal"><semantics><msub><mi>u</mi><mi>i</mi></msub><annotation encoding="application/x-tex">u_{i}</annotation></semantics></math> is the utility function for player <math alttext="i" class="ltx_Math" display="inline" id="S3.SS3.p3.2.m2" intent=":literal"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and <math alttext="s_{-i}^{*}" class="ltx_Math" display="inline" id="S3.SS3.p3.3.m3" intent=":literal"><semantics><msubsup><mi>s</mi><mrow><mo>−</mo><mi>i</mi></mrow><mo>∗</mo></msubsup><annotation encoding="application/x-tex">s_{-i}^{*}</annotation></semantics></math> denotes the strategies of all other players. This equilibrium condition ensures that no scale (player) can improve its contribution utility by unilaterally changing its attention weights, leading to a stable and optimal context representation.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S3.SS4">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S3.SS4.5.1.1">III-D</span> </span><span class="ltx_text ltx_font_italic" id="S3.SS4.6.2">Convex Optimization in Attention</span>
+</h3>
+<div class="ltx_para" id="S3.SS4.p1">
+<p class="ltx_p" id="S3.SS4.p1.1">Convex optimization provides a principled method to combine multiple objectives under constraints. The general form of a convex optimization problem is defined as:</p>
+</div>
+<div class="ltx_para" id="S3.SS4.p2">
+<table class="ltx_equationgroup ltx_eqn_table" id="S3.E4">
+<tbody>
+<tr class="ltx_equation ltx_eqn_row ltx_align_baseline" id="S3.E4X">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_eqn_cell"></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle\min_{x}" class="ltx_Math" display="inline" id="S3.E4X.2.1.1.m1" intent=":literal"><semantics><munder><mi>min</mi><mi>x</mi></munder><annotation encoding="application/x-tex">\displaystyle\min_{x}</annotation></semantics></math></td>
+<td class="ltx_td ltx_eqn_cell"></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle f(x)" class="ltx_Math" display="inline" id="S3.E4X.4.1.1.m1" intent=":literal"><semantics><mrow><mi>f</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">\displaystyle f(x)</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="2"><span class="ltx_tag ltx_tag_equationgroup ltx_align_right">(4)</span></td>
+</tr>
+<tr class="ltx_equation ltx_eqn_row ltx_align_baseline" id="S3.E4Xa">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_eqn_cell"></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><span class="ltx_text ltx_markedasmath ltx_font_italic" id="S3.E4Xa.2.1.1.1">subject to</span></td>
+<td class="ltx_td ltx_eqn_cell"></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle g_{i}(x)\leq 0,\quad h_{j}(x)=0" class="ltx_Math" display="inline" id="S3.E4Xa.4.1.1.m1" intent=":literal"><semantics><mrow><mrow><mrow><msub><mi>g</mi><mi>i</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>≤</mo><mn>0</mn></mrow><mo rspace="1.167em">,</mo><mrow><mrow><msub><mi>h</mi><mi>j</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mn>0</mn></mrow></mrow><annotation encoding="application/x-tex">\displaystyle g_{i}(x)\leq 0,\quad h_{j}(x)=0</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="ltx_para" id="S3.SS4.p3">
+<p class="ltx_p" id="S3.SS4.p3.3">where <math alttext="f" class="ltx_Math" display="inline" id="S3.SS4.p3.1.m1" intent=":literal"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math> is the convex objective function, <math alttext="g_{i}" class="ltx_Math" display="inline" id="S3.SS4.p3.2.m2" intent=":literal"><semantics><msub><mi>g</mi><mi>i</mi></msub><annotation encoding="application/x-tex">g_{i}</annotation></semantics></math> are convex inequality constraints, and <math alttext="h_{j}" class="ltx_Math" display="inline" id="S3.SS4.p3.3.m3" intent=":literal"><semantics><msub><mi>h</mi><mi>j</mi></msub><annotation encoding="application/x-tex">h_{j}</annotation></semantics></math> are affine equality constraints. In MAHA, this framework is utilized to aggregate attention scores from different scales while enforcing constraints that preserve important linguistic properties, such as probability distribution validity and sparsity.</p>
+</div>
+</section>
+</section>
+<section class="ltx_section" id="S4">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">IV </span><span class="ltx_text ltx_font_smallcaps" id="S4.1.1">The MAHA Framework</span>
+</h2>
+<div class="ltx_para" id="S4.p1">
+<p class="ltx_p" id="S4.p1.1">The MAHA framework introduces a systematic approach to sequence modeling by decomposing the input into multiple hierarchical scales and synthesizing them through mathematically rigorous aggregation rules. This section details the hierarchical decomposition strategy, scale-specific attention computation, and the optimization-driven mechanisms that govern information fusion. As illustrated in Figure <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S4.F1" title="Figure 1 ‣ IV-A Hierarchical Multiscale Decomposition with Learnable Downsampling ‣ IV The MAHA Framework ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">1</span></a>, MAHA is designed to replace the standard multi-head attention layer in transformer blocks while maintaining architectural compatibility.</p>
+</div>
+<section class="ltx_subsection" id="S4.SS1">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S4.SS1.5.1.1">IV-A</span> </span><span class="ltx_text ltx_font_italic" id="S4.SS1.6.2">Hierarchical Multiscale Decomposition with Learnable Downsampling</span>
+</h3>
+<div class="ltx_para" id="S4.SS1.p1">
+<p class="ltx_p" id="S4.SS1.p1.8">Let <math alttext="\mathbf{X}\in\mathbb{R}^{n\times d}" class="ltx_Math" display="inline" id="S4.SS1.p1.1.m1" intent=":literal"><semantics><mrow><mi>𝐗</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>n</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mi>d</mi></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{X}\in\mathbb{R}^{n\times d}</annotation></semantics></math> denote the input sequence, where <math alttext="n" class="ltx_Math" display="inline" id="S4.SS1.p1.2.m2" intent=":literal"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math> is the sequence length and <math alttext="d" class="ltx_Math" display="inline" id="S4.SS1.p1.3.m3" intent=":literal"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math> is the embedding dimension. MAHA decomposes <math alttext="\mathbf{X}" class="ltx_Math" display="inline" id="S4.SS1.p1.4.m4" intent=":literal"><semantics><mi>𝐗</mi><annotation encoding="application/x-tex">\mathbf{X}</annotation></semantics></math> into <math alttext="L" class="ltx_Math" display="inline" id="S4.SS1.p1.5.m5" intent=":literal"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> hierarchical scales through a series of learnable downsampling operations. Each scale <math alttext="l" class="ltx_Math" display="inline" id="S4.SS1.p1.6.m6" intent=":literal"><semantics><mi>l</mi><annotation encoding="application/x-tex">l</annotation></semantics></math> is derived from the previous scale <math alttext="l-1" class="ltx_Math" display="inline" id="S4.SS1.p1.7.m7" intent=":literal"><semantics><mrow><mi>l</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">l-1</annotation></semantics></math> using a parameterized operator <math alttext="\mathcal{D}_{l}" class="ltx_Math" display="inline" id="S4.SS1.p1.8.m8" intent=":literal"><semantics><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathcal{D}_{l}</annotation></semantics></math>:</p>
+</div>
+<div class="ltx_para" id="S4.SS1.p2">
+<table class="ltx_equation ltx_eqn_table" id="S4.E5">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{X}_{l}=\mathcal{D}_{l}(\mathbf{X}_{l-1}),\quad\mathbf{X}_{0}=\mathbf{X}" class="ltx_Math" display="block" id="S4.E5.m1" intent=":literal"><semantics><mrow><mrow><msub><mi>𝐗</mi><mi>l</mi></msub><mo>=</mo><mrow><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝐗</mi><mrow><mi>l</mi><mo>−</mo><mn>1</mn></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><mo rspace="1.167em">,</mo><mrow><msub><mi>𝐗</mi><mn>0</mn></msub><mo>=</mo><mi>𝐗</mi></mrow></mrow><annotation encoding="application/x-tex">\mathbf{X}_{l}=\mathcal{D}_{l}(\mathbf{X}_{l-1}),\quad\mathbf{X}_{0}=\mathbf{X}</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(5)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS1.p3">
+<p class="ltx_p" id="S4.SS1.p3.1">The downsampling operator <math alttext="\mathcal{D}_{l}" class="ltx_Math" display="inline" id="S4.SS1.p3.1.m1" intent=":literal"><semantics><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathcal{D}_{l}</annotation></semantics></math> is implemented via one of two mechanisms:</p>
+<ol class="ltx_enumerate" id="S4.I1">
+<li class="ltx_item" id="S4.I1.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span>
+<div class="ltx_para" id="S4.I1.i1.p1">
+<p class="ltx_p" id="S4.I1.i1.p1.3"><span class="ltx_text ltx_font_bold" id="S4.I1.i1.p1.3.1">Strided Convolution:</span> <math alttext="\mathcal{D}_{l}(\mathbf{X})=\text{Conv1D}(\mathbf{X},\mathbf{W}_{l}^{s},s_{l})" class="ltx_Math" display="inline" id="S4.I1.i1.p1.1.m1" intent=":literal"><semantics><mrow><mrow><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝐗</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mtext>Conv1D</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝐗</mi><mo>,</mo><msubsup><mi>𝐖</mi><mi>l</mi><mi>s</mi></msubsup><mo>,</mo><msub><mi>s</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathcal{D}_{l}(\mathbf{X})=\text{Conv1D}(\mathbf{X},\mathbf{W}_{l}^{s},s_{l})</annotation></semantics></math>, where <math alttext="\mathbf{W}_{l}^{s}" class="ltx_Math" display="inline" id="S4.I1.i1.p1.2.m2" intent=":literal"><semantics><msubsup><mi>𝐖</mi><mi>l</mi><mi>s</mi></msubsup><annotation encoding="application/x-tex">\mathbf{W}_{l}^{s}</annotation></semantics></math> is a learnable kernel and <math alttext="s_{l}" class="ltx_Math" display="inline" id="S4.I1.i1.p1.3.m3" intent=":literal"><semantics><msub><mi>s</mi><mi>l</mi></msub><annotation encoding="application/x-tex">s_{l}</annotation></semantics></math> is the stride.</p>
+</div>
+</li>
+<li class="ltx_item" id="S4.I1.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span>
+<div class="ltx_para" id="S4.I1.i2.p1">
+<p class="ltx_p" id="S4.I1.i2.p1.2"><span class="ltx_text ltx_font_bold" id="S4.I1.i2.p1.2.1">Adaptive Pooling:</span> <math alttext="\mathcal{D}_{l}(\mathbf{X})=\text{AdaptiveMaxPool}(\mathbf{X},n_{l})" class="ltx_Math" display="inline" id="S4.I1.i2.p1.1.m1" intent=":literal"><semantics><mrow><mrow><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝐗</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mrow><mtext>AdaptiveMaxPool</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>𝐗</mi><mo>,</mo><msub><mi>n</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathcal{D}_{l}(\mathbf{X})=\text{AdaptiveMaxPool}(\mathbf{X},n_{l})</annotation></semantics></math>, which dynamically adjusts the pooling window to match the target length <math alttext="n_{l}" class="ltx_Math" display="inline" id="S4.I1.i2.p1.2.m2" intent=":literal"><semantics><msub><mi>n</mi><mi>l</mi></msub><annotation encoding="application/x-tex">n_{l}</annotation></semantics></math>.</p>
+</div>
+</li>
+</ol>
+</div>
+<figure class="ltx_figure" id="S4.F1"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_square" height="837" id="S4.F1.g1" src="x1.png" width="747"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" id="S4.F1.2.1.1" style="font-size:90%;">Figure 1</span>: </span><span class="ltx_text" id="S4.F1.3.2" style="font-size:90%;">Schematic overview of the MAHA architecture integrated within a Transformer block. The input is decomposed into multiple scales, processed via shared-value attention, and aggregated using optimization or game-theoretic layers.</span></figcaption>
+</figure>
+<div class="ltx_para" id="S4.SS1.p4">
+<p class="ltx_p" id="S4.SS1.p4.2">The sequence lengths follow an exponential decay schedule <math alttext="n_{l}=\lfloor n_{l-1}/r\rfloor" class="ltx_Math" display="inline" id="S4.SS1.p4.1.m1" intent=":literal"><semantics><mrow><msub><mi>n</mi><mi>l</mi></msub><mo>=</mo><mrow><mo stretchy="false">⌊</mo><mrow><msub><mi>n</mi><mrow><mi>l</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>/</mo><mi>r</mi></mrow><mo stretchy="false">⌋</mo></mrow></mrow><annotation encoding="application/x-tex">n_{l}=\lfloor n_{l-1}/r\rfloor</annotation></semantics></math>, where <math alttext="r&gt;1" class="ltx_Math" display="inline" id="S4.SS1.p4.2.m2" intent=":literal"><semantics><mrow><mi>r</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r&gt;1</annotation></semantics></math> is a compression ratio hyperparameter. This creates a pyramidal structure where higher scales capture increasingly coarse-grained semantic patterns while preserving essential features.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S4.SS2">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S4.SS2.5.1.1">IV-B</span> </span><span class="ltx_text ltx_font_italic" id="S4.SS2.6.2">Multiscale Attention Computation</span>
+</h3>
+<div class="ltx_para" id="S4.SS2.p1">
+<p class="ltx_p" id="S4.SS2.p1.5">At each scale <math alttext="l" class="ltx_Math" display="inline" id="S4.SS2.p1.1.m1" intent=":literal"><semantics><mi>l</mi><annotation encoding="application/x-tex">l</annotation></semantics></math>, MAHA computes independent attention matrices. A key innovation in MAHA is the decoupling of projection parameters to enhance efficiency: while Query (<math alttext="\mathbf{Q}" class="ltx_Math" display="inline" id="S4.SS2.p1.2.m2" intent=":literal"><semantics><mi>𝐐</mi><annotation encoding="application/x-tex">\mathbf{Q}</annotation></semantics></math>) and Key (<math alttext="\mathbf{K}" class="ltx_Math" display="inline" id="S4.SS2.p1.3.m3" intent=":literal"><semantics><mi>𝐊</mi><annotation encoding="application/x-tex">\mathbf{K}</annotation></semantics></math>) projections are scale-specific, the Value (<math alttext="\mathbf{V}" class="ltx_Math" display="inline" id="S4.SS2.p1.4.m4" intent=":literal"><semantics><mi>𝐕</mi><annotation encoding="application/x-tex">\mathbf{V}</annotation></semantics></math>) projection is shared across scales. Given the representation <math alttext="\mathbf{X}_{l}" class="ltx_Math" display="inline" id="S4.SS2.p1.5.m5" intent=":literal"><semantics><msub><mi>𝐗</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathbf{X}_{l}</annotation></semantics></math>, the projections are defined as:</p>
+</div>
+<div class="ltx_para" id="S4.SS2.p2">
+<table class="ltx_equation ltx_eqn_table" id="S4.E6">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{Q}_{l}=\mathbf{X}_{l}\mathbf{W}_{l}^{Q},\quad\mathbf{K}_{l}=\mathbf{X}_{l}\mathbf{W}_{l}^{K}" class="ltx_Math" display="block" id="S4.E6.m1" intent=":literal"><semantics><mrow><mrow><msub><mi>𝐐</mi><mi>l</mi></msub><mo>=</mo><mrow><msub><mi>𝐗</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><msubsup><mi>𝐖</mi><mi>l</mi><mi>Q</mi></msubsup></mrow></mrow><mo rspace="1.167em">,</mo><mrow><msub><mi>𝐊</mi><mi>l</mi></msub><mo>=</mo><mrow><msub><mi>𝐗</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><msubsup><mi>𝐖</mi><mi>l</mi><mi>K</mi></msubsup></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathbf{Q}_{l}=\mathbf{X}_{l}\mathbf{W}_{l}^{Q},\quad\mathbf{K}_{l}=\mathbf{X}_{l}\mathbf{W}_{l}^{K}</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(6)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS2.p3">
+<p class="ltx_p" id="S4.SS2.p3.2">where <math alttext="\mathbf{W}_{l}^{Q},\mathbf{W}_{l}^{K}\in\mathbb{R}^{d\times d_{k}}" class="ltx_Math" display="inline" id="S4.SS2.p3.1.m1" intent=":literal"><semantics><mrow><mrow><msubsup><mi>𝐖</mi><mi>l</mi><mi>Q</mi></msubsup><mo>,</mo><msubsup><mi>𝐖</mi><mi>l</mi><mi>K</mi></msubsup></mrow><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>d</mi><mo lspace="0.222em" rspace="0.222em">×</mo><msub><mi>d</mi><mi>k</mi></msub></mrow></msup></mrow><annotation encoding="application/x-tex">\mathbf{W}_{l}^{Q},\mathbf{W}_{l}^{K}\in\mathbb{R}^{d\times d_{k}}</annotation></semantics></math>. The attention weights <math alttext="\mathbf{A}_{l}" class="ltx_Math" display="inline" id="S4.SS2.p3.2.m2" intent=":literal"><semantics><msub><mi>𝐀</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathbf{A}_{l}</annotation></semantics></math> are computed via the scaled dot-product:</p>
+<table class="ltx_equation ltx_eqn_table" id="S4.Ex1">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{A}_{l}=\text{softmax}\left(\frac{\mathbf{Q}_{l}\mathbf{K}_{l}^{T}}{\sqrt{d_{k}}}\right)" class="ltx_Math" display="block" id="S4.Ex1.m1" intent=":literal"><semantics><mrow><msub><mi>𝐀</mi><mi>l</mi></msub><mo>=</mo><mrow><mtext>softmax</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo>(</mo><mfrac><mrow><msub><mi>𝐐</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><msubsup><mi>𝐊</mi><mi>l</mi><mi>T</mi></msubsup></mrow><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mfrac><mo>)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathbf{A}_{l}=\text{softmax}\left(\frac{\mathbf{Q}_{l}\mathbf{K}_{l}^{T}}{\sqrt{d_{k}}}\right)</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS2.p4">
+<p class="ltx_p" id="S4.SS2.p4.5">Unlike standard transformers, MAHA employs a shared value projection: <math alttext="\mathbf{V}_{base}=\mathbf{X}\mathbf{W}^{V}" class="ltx_Math" display="inline" id="S4.SS2.p4.1.m1" intent=":literal"><semantics><mrow><msub><mi>𝐕</mi><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow></msub><mo>=</mo><msup><mi>𝐗𝐖</mi><mi>V</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf{V}_{base}=\mathbf{X}\mathbf{W}^{V}</annotation></semantics></math>. The value matrix for scale <math alttext="l" class="ltx_Math" display="inline" id="S4.SS2.p4.2.m2" intent=":literal"><semantics><mi>l</mi><annotation encoding="application/x-tex">l</annotation></semantics></math>, denoted as <math alttext="\mathbf{V}_{l}" class="ltx_Math" display="inline" id="S4.SS2.p4.3.m3" intent=":literal"><semantics><msub><mi>𝐕</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathbf{V}_{l}</annotation></semantics></math>, is obtained by applying the corresponding downsampling operator to the base values: <math alttext="\mathbf{V}_{l}=\mathcal{D}_{l}(\mathbf{V}_{base})" class="ltx_Math" display="inline" id="S4.SS2.p4.4.m4" intent=":literal"><semantics><mrow><msub><mi>𝐕</mi><mi>l</mi></msub><mo>=</mo><mrow><msub><mi class="ltx_font_mathcaligraphic">𝒟</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝐕</mi><mrow><mi>b</mi><mo lspace="0em" rspace="0em">​</mo><mi>a</mi><mo lspace="0em" rspace="0em">​</mo><mi>s</mi><mo lspace="0em" rspace="0em">​</mo><mi>e</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathbf{V}_{l}=\mathcal{D}_{l}(\mathbf{V}_{base})</annotation></semantics></math>. The scale-specific output <math alttext="\mathbf{O}_{l}" class="ltx_Math" display="inline" id="S4.SS2.p4.5.m5" intent=":literal"><semantics><msub><mi>𝐎</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathbf{O}_{l}</annotation></semantics></math> is then:</p>
+</div>
+<div class="ltx_para" id="S4.SS2.p5">
+<table class="ltx_equation ltx_eqn_table" id="S4.Ex2">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{O}_{l}=\mathbf{A}_{l}\mathbf{V}_{l}" class="ltx_Math" display="block" id="S4.Ex2.m1" intent=":literal"><semantics><mrow><msub><mi>𝐎</mi><mi>l</mi></msub><mo>=</mo><mrow><msub><mi>𝐀</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><msub><mi>𝐕</mi><mi>l</mi></msub></mrow></mrow><annotation encoding="application/x-tex">\mathbf{O}_{l}=\mathbf{A}_{l}\mathbf{V}_{l}</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS2.p6">
+<p class="ltx_p" id="S4.SS2.p6.1">This design reduces the parameter count significantly while ensuring that the information flow remains consistent across granularity levels.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S4.SS3">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S4.SS3.5.1.1">IV-C</span> </span><span class="ltx_text ltx_font_italic" id="S4.SS3.6.2">Aggregation of Multiscale Attention Outputs</span>
+</h3>
+<div class="ltx_para" id="S4.SS3.p1">
+<p class="ltx_p" id="S4.SS3.p1.2">The multiscale outputs <math alttext="\{\mathbf{O}_{l}\}" class="ltx_Math" display="inline" id="S4.SS3.p1.1.m1" intent=":literal"><semantics><mrow><mo stretchy="false">{</mo><msub><mi>𝐎</mi><mi>l</mi></msub><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\{\mathbf{O}_{l}\}</annotation></semantics></math> must be synthesized into a unified representation <math alttext="\mathbf{O}^{*}" class="ltx_Math" display="inline" id="S4.SS3.p1.2.m2" intent=":literal"><semantics><msup><mi>𝐎</mi><mo>∗</mo></msup><annotation encoding="application/x-tex">\mathbf{O}^{*}</annotation></semantics></math>. MAHA proposes two rigorous strategies:</p>
+</div>
+<div class="ltx_para" id="S4.SS3.p2">
+<p class="ltx_p" id="S4.SS3.p2.4">CO-Based Aggregation: We formulate aggregation as a convex optimization problem. Let <math alttext="\mathcal{U}_{l}" class="ltx_Math" display="inline" id="S4.SS3.p2.1.m1" intent=":literal"><semantics><msub><mi class="ltx_font_mathcaligraphic">𝒰</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathcal{U}_{l}</annotation></semantics></math> denote an upsampling operator mapping <math alttext="\mathbf{O}_{l}" class="ltx_Math" display="inline" id="S4.SS3.p2.2.m2" intent=":literal"><semantics><msub><mi>𝐎</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\mathbf{O}_{l}</annotation></semantics></math> back to the original sequence length <math alttext="n" class="ltx_Math" display="inline" id="S4.SS3.p2.3.m3" intent=":literal"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>. The aggregated output is obtained by solving for the optimal mixing weights <math alttext="\mathbf{w}" class="ltx_Math" display="inline" id="S4.SS3.p2.4.m4" intent=":literal"><semantics><mi>𝐰</mi><annotation encoding="application/x-tex">\mathbf{w}</annotation></semantics></math>:</p>
+</div>
+<div class="ltx_para" id="S4.SS3.p3">
+<table class="ltx_equation ltx_eqn_table" id="S4.E7">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\min_{\mathbf{w}}\left\|\sum_{l=0}^{L}w_{l}\mathcal{U}_{l}(\mathbf{O}_{l})-\mathbf{O}^{*}\right\|_{F}^{2}+\lambda\|\mathbf{w}\|_{1}\quad\text{s.t.}\sum w_{l}=1,w_{l}\geq 0" class="ltx_Math" display="block" id="S4.E7.m1" intent=":literal"><semantics><mrow><mrow><mrow><mrow><mrow><munder><mi>min</mi><mi>𝐰</mi></munder><mo>⁡</mo><msubsup><mrow><mo>‖</mo><mrow><mrow><munderover><mo lspace="0em" movablelimits="false">∑</mo><mrow><mi>l</mi><mo>=</mo><mn>0</mn></mrow><mi>L</mi></munderover><mrow><msub><mi>w</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><msub><mi class="ltx_font_mathcaligraphic">𝒰</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝐎</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>−</mo><msup><mi>𝐎</mi><mo>∗</mo></msup></mrow><mo>‖</mo></mrow><mi>F</mi><mn>2</mn></msubsup></mrow><mo>+</mo><mrow><mi>λ</mi><mo lspace="0em" rspace="0em">​</mo><msub><mrow><mo stretchy="false">‖</mo><mi>𝐰</mi><mo stretchy="false">‖</mo></mrow><mn>1</mn></msub></mrow></mrow><mspace style="width:1em;" width="1em"></mspace><mrow><mtext>s.t.</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo movablelimits="false">∑</mo><msub><mi>w</mi><mi>l</mi></msub></mrow></mrow></mrow><mo>=</mo><mn>1</mn></mrow><mo>,</mo><mrow><msub><mi>w</mi><mi>l</mi></msub><mo>≥</mo><mn>0</mn></mrow></mrow><annotation encoding="application/x-tex">\min_{\mathbf{w}}\left\|\sum_{l=0}^{L}w_{l}\mathcal{U}_{l}(\mathbf{O}_{l})-\mathbf{O}^{*}\right\|_{F}^{2}+\lambda\|\mathbf{w}\|_{1}\quad\text{s.t.}\sum w_{l}=1,w_{l}\geq 0</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(7)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS3.p4">
+<p class="ltx_p" id="S4.SS3.p4.1">Here, <math alttext="\lambda" class="ltx_Math" display="inline" id="S4.SS3.p4.1.m1" intent=":literal"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math> controls sparsity, encouraging the model to select the most informative scales.</p>
+</div>
+<div class="ltx_para" id="S4.SS3.p5">
+<p class="ltx_p" id="S4.SS3.p5.2"><span class="ltx_text ltx_font_bold" id="S4.SS3.p5.2.1">Nash Equilibrium-Based Aggregation:</span> Alternatively, aggregation is modeled as a non-cooperative game where each scale <math alttext="l" class="ltx_Math" display="inline" id="S4.SS3.p5.1.m1" intent=":literal"><semantics><mi>l</mi><annotation encoding="application/x-tex">l</annotation></semantics></math> competes to minimize its reconstruction error. The equilibrium weights <math alttext="w_{l}^{*}" class="ltx_Math" display="inline" id="S4.SS3.p5.2.m2" intent=":literal"><semantics><msubsup><mi>w</mi><mi>l</mi><mo>∗</mo></msubsup><annotation encoding="application/x-tex">w_{l}^{*}</annotation></semantics></math> satisfy:</p>
+</div>
+<div class="ltx_para" id="S4.SS3.p6">
+<table class="ltx_equation ltx_eqn_table" id="S4.E8">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="w_{l}^{*}=\arg\min_{w_{l}}\left\|\mathcal{U}_{l}(\mathbf{O}_{l})-\mathbf{O}^{*}(\mathbf{w}_{-l}^{*})\right\|_{2}^{2}" class="ltx_Math" display="block" id="S4.E8.m1" intent=":literal"><semantics><mrow><msubsup><mi>w</mi><mi>l</mi><mo>∗</mo></msubsup><mo>=</mo><mrow><mi>arg</mi><mo lspace="0.167em">⁡</mo><mrow><munder><mi>min</mi><msub><mi>w</mi><mi>l</mi></msub></munder><mo>⁡</mo><msubsup><mrow><mo>‖</mo><mrow><mrow><msub><mi class="ltx_font_mathcaligraphic">𝒰</mi><mi>l</mi></msub><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝐎</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo>−</mo><mrow><msup><mi>𝐎</mi><mo>∗</mo></msup><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msubsup><mi>𝐰</mi><mrow><mo>−</mo><mi>l</mi></mrow><mo>∗</mo></msubsup><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>‖</mo></mrow><mn>2</mn><mn>2</mn></msubsup></mrow></mrow></mrow><annotation encoding="application/x-tex">w_{l}^{*}=\arg\min_{w_{l}}\left\|\mathcal{U}_{l}(\mathbf{O}_{l})-\mathbf{O}^{*}(\mathbf{w}_{-l}^{*})\right\|_{2}^{2}</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(8)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS3.p7">
+<p class="ltx_p" id="S4.SS3.p7.1">This ensures that no scale can unilaterally improve the representation quality.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S4.SS4">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S4.SS4.5.1.1">IV-D</span> </span><span class="ltx_text ltx_font_italic" id="S4.SS4.6.2">Hybrid Dilated-Convolutional Transformer Design</span>
+</h3>
+<div class="ltx_para" id="S4.SS4.p1">
+<p class="ltx_p" id="S4.SS4.p1.1">MAHA integrates dilated convolutions to capture local context prior to attention. The hybrid block consists of:</p>
+<ul class="ltx_itemize" id="S4.I2">
+<li class="ltx_item" id="S4.I2.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S4.I2.i1.p1">
+<p class="ltx_p" id="S4.I2.i1.p1.2"><span class="ltx_text ltx_font_bold" id="S4.I2.i1.p1.2.1">Dilated Convolution Blocks:</span> For scale <math alttext="l" class="ltx_Math" display="inline" id="S4.I2.i1.p1.1.m1" intent=":literal"><semantics><mi>l</mi><annotation encoding="application/x-tex">l</annotation></semantics></math>, the output is <math alttext="\mathbf{C}_{l}=\text{ReLU}(\text{DilatedConv}(\mathbf{X}_{l}))" class="ltx_Math" display="inline" id="S4.I2.i1.p1.2.m2" intent=":literal"><semantics><mrow><msub><mi>𝐂</mi><mi>l</mi></msub><mo>=</mo><mrow><mtext>ReLU</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><mtext>DilatedConv</mtext><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msub><mi>𝐗</mi><mi>l</mi></msub><mo stretchy="false">)</mo></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\mathbf{C}_{l}=\text{ReLU}(\text{DilatedConv}(\mathbf{X}_{l}))</annotation></semantics></math>.</p>
+</div>
+</li>
+<li class="ltx_item" id="S4.I2.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S4.I2.i2.p1">
+<p class="ltx_p" id="S4.I2.i2.p1.3"><span class="ltx_text ltx_font_bold" id="S4.I2.i2.p1.3.1">Cross-Scale Gating:</span> <math alttext="\mathbf{G}_{l}=\sigma(\mathbf{W}_{g}\mathbf{X}_{l})\odot\mathbf{X}_{l-1}" class="ltx_Math" display="inline" id="S4.I2.i2.p1.1.m1" intent=":literal"><semantics><mrow><msub><mi>𝐆</mi><mi>l</mi></msub><mo>=</mo><mrow><mrow><mi>σ</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><msub><mi>𝐖</mi><mi>g</mi></msub><mo lspace="0em" rspace="0em">​</mo><msub><mi>𝐗</mi><mi>l</mi></msub></mrow><mo rspace="0.055em" stretchy="false">)</mo></mrow></mrow><mo rspace="0.222em">⊙</mo><msub><mi>𝐗</mi><mrow><mi>l</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow></mrow><annotation encoding="application/x-tex">\mathbf{G}_{l}=\sigma(\mathbf{W}_{g}\mathbf{X}_{l})\odot\mathbf{X}_{l-1}</annotation></semantics></math>, where <math alttext="\sigma" class="ltx_Math" display="inline" id="S4.I2.i2.p1.2.m2" intent=":literal"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math> is the sigmoid function and <math alttext="\odot" class="ltx_Math" display="inline" id="S4.I2.i2.p1.3.m3" intent=":literal"><semantics><mo>⊙</mo><annotation encoding="application/x-tex">\odot</annotation></semantics></math> denotes element-wise multiplication.</p>
+</div>
+</li>
+<li class="ltx_item" id="S4.I2.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S4.I2.i3.p1">
+<p class="ltx_p" id="S4.I2.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S4.I2.i3.p1.1.1">Nearest-Neighbor Upsampling:</span> Used to reconstruct the full sequence efficiently.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<section class="ltx_subsection" id="S4.SS5">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S4.SS5.5.1.1">IV-E</span> </span><span class="ltx_text ltx_font_italic" id="S4.SS5.6.2">Complexity Reduction through Hierarchical Sparsity</span>
+</h3>
+<div class="ltx_para" id="S4.SS5.p1">
+<p class="ltx_p" id="S4.SS5.p1.1">The total computational complexity of MAHA is governed by the hierarchical decomposition. For a sequence of length <math alttext="n" class="ltx_Math" display="inline" id="S4.SS5.p1.1.m1" intent=":literal"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>, the complexity is defined as:</p>
+</div>
+<div class="ltx_para" id="S4.SS5.p2">
+<table class="ltx_equation ltx_eqn_table" id="S4.E9">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\Omega(n)=\sum_{l=0}^{L}\left(\frac{n}{r^{l}}\right)^{2}d+O(n\log n)" class="ltx_Math" display="block" id="S4.E9.m1" intent=":literal"><semantics><mrow><mrow><mi mathvariant="normal">Ω</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow></mrow><mo rspace="0.111em">=</mo><mrow><mrow><munderover><mo movablelimits="false" rspace="0em">∑</mo><mrow><mi>l</mi><mo>=</mo><mn>0</mn></mrow><mi>L</mi></munderover><mrow><msup><mrow><mo>(</mo><mfrac><mi>n</mi><msup><mi>r</mi><mi>l</mi></msup></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo lspace="0em" rspace="0em">​</mo><mi>d</mi></mrow></mrow><mo>+</mo><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mrow><mi>n</mi><mo lspace="0.167em" rspace="0em">​</mo><mrow><mi>log</mi><mo lspace="0.167em">⁡</mo><mi>n</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><annotation encoding="application/x-tex">\Omega(n)=\sum_{l=0}^{L}\left(\frac{n}{r^{l}}\right)^{2}d+O(n\log n)</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(9)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS5.p3">
+<p class="ltx_p" id="S4.SS5.p3.1">For <math alttext="r=2" class="ltx_Math" display="inline" id="S4.SS5.p3.1.m1" intent=":literal"><semantics><mrow><mi>r</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">r=2</annotation></semantics></math>, the geometric series converges, yielding:</p>
+</div>
+<div class="ltx_para" id="S4.SS5.p4">
+<table class="ltx_equation ltx_eqn_table" id="S4.E10">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="O\left(\frac{n^{2}}{r^{2}-1}\right)" class="ltx_Math" display="block" id="S4.E10.m1" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo>(</mo><mfrac><msup><mi>n</mi><mn>2</mn></msup><mrow><msup><mi>r</mi><mn>2</mn></msup><mo>−</mo><mn>1</mn></mrow></mfrac><mo>)</mo></mrow></mrow><annotation encoding="application/x-tex">O\left(\frac{n^{2}}{r^{2}-1}\right)</annotation></semantics></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(10)</span></td>
+</tr></tbody>
+</table>
+</div>
+<div class="ltx_para" id="S4.SS5.p5">
+<p class="ltx_p" id="S4.SS5.p5.1">which is significantly lower than standard attention.</p>
+</div>
+<div class="ltx_para" id="S4.SS5.p6">
+<ul class="ltx_itemize" id="S4.I3">
+<li class="ltx_item" id="S4.I3.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S4.I3.i1.p1">
+<p class="ltx_p" id="S4.I3.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S4.I3.i1.p1.1.1">Scale-Specific Sparsity:</span> Coarser scales have <math alttext="n_{l}\ll n" class="ltx_Math" display="inline" id="S4.I3.i1.p1.1.m1" intent=":literal"><semantics><mrow><msub><mi>n</mi><mi>l</mi></msub><mo>≪</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n_{l}\ll n</annotation></semantics></math>, reducing the cost quadratically.</p>
+</div>
+</li>
+<li class="ltx_item" id="S4.I3.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S4.I3.i2.p1">
+<p class="ltx_p" id="S4.I3.i2.p1.2"><span class="ltx_text ltx_font_bold" id="S4.I3.i2.p1.2.1">Dynamic Weight Sparsity:</span> The <math alttext="\ell_{1}" class="ltx_Math" display="inline" id="S4.I3.i2.p1.1.m1" intent=":literal"><semantics><msub><mi mathvariant="normal">ℓ</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\ell_{1}</annotation></semantics></math>-regularized weights <math alttext="w_{l}" class="ltx_Math" display="inline" id="S4.I3.i2.p1.2.m2" intent=":literal"><semantics><msub><mi>w</mi><mi>l</mi></msub><annotation encoding="application/x-tex">w_{l}</annotation></semantics></math> prune uninformative scales during inference.</p>
+</div>
+</li>
+</ul>
+</div>
+<figure class="ltx_figure" id="S4.F2"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="468" id="S4.F2.g1" src="x2.png" width="664"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" id="S4.F2.2.1.1" style="font-size:90%;">Figure 2</span>: </span><span class="ltx_text" id="S4.F2.3.2" style="font-size:90%;">Computational complexity comparison. MAHA demonstrates near-linear scaling compared to the quadratic growth of standard Self-Attention.</span></figcaption>
+</figure>
+</section>
+</section>
+<section class="ltx_section" id="S5">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">V </span><span class="ltx_text ltx_font_smallcaps" id="S5.1.1">Experiments</span>
+</h2>
+<div class="ltx_para" id="S5.p1">
+<p class="ltx_p" id="S5.p1.1">To evaluate the empirical efficacy of MAHA, we conducted extensive experiments across diverse NLP tasks. Our evaluation framework focuses on three pivotal research questions:</p>
+<ul class="ltx_itemize" id="S5.I1">
+<li class="ltx_item" id="S5.I1.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I1.i1.p1">
+<p class="ltx_p" id="S5.I1.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I1.i1.p1.1.1">RQ1:</span> How does MAHA compare to state-of-the-art attention mechanisms in terms of computational efficiency and downstream task performance?</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I1.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I1.i2.p1">
+<p class="ltx_p" id="S5.I1.i2.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I1.i2.p1.1.1">RQ2:</span> What is the comparative impact of convex optimization versus game-theoretic aggregation strategies on model behavior?</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I1.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I1.i3.p1">
+<p class="ltx_p" id="S5.I1.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I1.i3.p1.1.1">RQ3:</span> How does the granularity of the hierarchical decomposition affect the trade-off between representational accuracy and computational cost?</p>
+</div>
+</li>
+</ul>
+</div>
+<section class="ltx_subsection" id="S5.SS1">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S5.SS1.5.1.1">V-A</span> </span><span class="ltx_text ltx_font_italic" id="S5.SS1.6.2">Experimental Setup</span>
+</h3>
+<div class="ltx_para" id="S5.SS1.p1">
+<p class="ltx_p" id="S5.SS1.p1.1">We evaluated MAHA on four benchmark datasets designed to stress-test different aspects of sequence modeling:</p>
+<ul class="ltx_itemize" id="S5.I2">
+<li class="ltx_item" id="S5.I2.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I2.i1.p1">
+<p class="ltx_p" id="S5.I2.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I2.i1.p1.1.1">Text Classification:</span> GLUE benchmark <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">wang2018a</span>]</cite>, focusing on MNLI and SST-2.</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I2.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I2.i2.p1">
+<p class="ltx_p" id="S5.I2.i2.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I2.i2.p1.1.1">Long-Range Dependency Modeling:</span> PG-19 dataset <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">sun2021a</span>]</cite> (<math alttext="&gt;4k" class="ltx_Math" display="inline" id="S5.I2.i2.p1.1.m1" intent=":literal"><semantics><mrow><mi></mi><mo>&gt;</mo><mrow><mn>4</mn><mo lspace="0em" rspace="0em">​</mo><mi>k</mi></mrow></mrow><annotation encoding="application/x-tex">&gt;4k</annotation></semantics></math> tokens).</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I2.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I2.i3.p1">
+<p class="ltx_p" id="S5.I2.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I2.i3.p1.1.1">Machine Translation:</span> WMT14 English-German <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">bojar2016a</span>]</cite>.</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I2.i4" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I2.i4.p1">
+<p class="ltx_p" id="S5.I2.i4.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I2.i4.p1.1.1">Question Answering:</span> SQuAD v2.0 <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">rajpurkar2016a</span>]</cite>.</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="ltx_para" id="S5.SS1.p2">
+<p class="ltx_p" id="S5.SS1.p2.1">For comparative analysis, MAHA was benchmarked against five widely adopted attention mechanisms: Standard Multi-Head Attention (MHA) <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">vaswani2017a</span>]</cite>, Longformer <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">beltagy2020a</span>]</cite>, BigBird <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">zaheer2020a</span>]</cite>, Reformer <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">kitaev2020a</span>]</cite>, and Performer <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">choromanski2020a</span>]</cite>.</p>
+</div>
+<div class="ltx_para" id="S5.SS1.p3">
+<p class="ltx_p" id="S5.SS1.p3.1"><span class="ltx_text ltx_font_bold" id="S5.SS1.p3.1.1">Implementation Details:</span></p>
+<ul class="ltx_itemize" id="S5.I3">
+<li class="ltx_item" id="S5.I3.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I3.i1.p1">
+<p class="ltx_p" id="S5.I3.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I3.i1.p1.1.1">Model Architecture:</span> Transformer backbone with 12 layers, hidden dimensionality of 768, and 12 attention heads.</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I3.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I3.i2.p1">
+<p class="ltx_p" id="S5.I3.i2.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I3.i2.p1.1.1">Training:</span> Batch size 32 (classification), 16 (translation/QA); LR <math alttext="5\times 10^{-5}" class="ltx_Math" display="inline" id="S5.I3.i2.p1.1.m1" intent=":literal"><semantics><mrow><mn>5</mn><mo lspace="0.222em" rspace="0.222em">×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">5\times 10^{-5}</annotation></semantics></math> with warmup 10k steps.</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I3.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I3.i3.p1">
+<p class="ltx_p" id="S5.I3.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I3.i3.p1.1.1">Sequence Length:</span> 512 (classification/QA), 4096 (PG-19).</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I3.i4" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S5.I3.i4.p1">
+<p class="ltx_p" id="S5.I3.i4.p1.2"><span class="ltx_text ltx_font_bold" id="S5.I3.i4.p1.2.1">MAHA Parameters:</span> <math alttext="L=4" class="ltx_Math" display="inline" id="S5.I3.i4.p1.1.m1" intent=":literal"><semantics><mrow><mi>L</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">L=4</annotation></semantics></math> scales (32, 64, 128, 256 tokens); strided conv (kernel=3); aggregation regularization <math alttext="\lambda=0.1" class="ltx_Math" display="inline" id="S5.I3.i4.p1.2.m2" intent=":literal"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0.1</mn></mrow><annotation encoding="application/x-tex">\lambda=0.1</annotation></semantics></math>.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<section class="ltx_subsection" id="S5.SS2">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S5.SS2.5.1.1">V-B</span> </span><span class="ltx_text ltx_font_italic" id="S5.SS2.6.2">Main Results</span>
+</h3>
+<div class="ltx_para" id="S5.SS2.p1">
+<p class="ltx_p" id="S5.SS2.p1.1">Table <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.T1" title="TABLE I ‣ V-B Main Results ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">I</span></a> summarizes the performance on benchmark datasets. MAHA achieves competitive accuracy with standard attention while outperforming sparse baselines on long-context tasks (PG-19).</p>
+</div>
+<figure class="ltx_table" id="S5.T1">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_table"><span class="ltx_text" id="S5.T1.4.1.1" style="font-size:90%;">TABLE I</span>: </span><span class="ltx_text" id="S5.T1.5.2" style="font-size:90%;">Performance Comparison Across Tasks.</span></figcaption><div class="ltx_flex_figure">
+<div class="ltx_flex_cell ltx_flex_size_1">
+<table class="ltx_tabular ltx_centering ltx_figure_panel ltx_guessed_headers ltx_align_middle" id="S5.T1.2">
+<thead class="ltx_thead">
+<tr class="ltx_tr" id="S5.T1.2.3.1">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_th_row ltx_border_t" id="S5.T1.2.3.1.1"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.1.1">Model</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T1.2.3.1.2"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.2.1">MNLI</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T1.2.3.1.3"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.3.1">SST-2</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T1.2.3.1.4"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.4.1">PG-19</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T1.2.3.1.5"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.5.1">WMT</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T1.2.3.1.6"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.6.1">SQuAD</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T1.2.3.1.7"><span class="ltx_text ltx_font_bold" id="S5.T1.2.3.1.7.1">Memory</span></th>
+</tr>
+<tr class="ltx_tr" id="S5.T1.2.2">
+<th class="ltx_td ltx_th ltx_th_row" id="S5.T1.2.2.3"></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column" id="S5.T1.2.2.4">(Acc)</th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column" id="S5.T1.2.2.5">(Acc)</th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column" id="S5.T1.1.1.1">(PPL) <math alttext="\downarrow" class="ltx_Math" display="inline" id="S5.T1.1.1.1.m1" intent=":literal"><semantics><mo stretchy="false">↓</mo><annotation encoding="application/x-tex">\downarrow</annotation></semantics></math>
+</th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column" id="S5.T1.2.2.6">(BLEU)</th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column" id="S5.T1.2.2.7">(F1)</th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column" id="S5.T1.2.2.2">(GB) <math alttext="\downarrow" class="ltx_Math" display="inline" id="S5.T1.2.2.2.m1" intent=":literal"><semantics><mo stretchy="false">↓</mo><annotation encoding="application/x-tex">\downarrow</annotation></semantics></math>
+</th>
+</tr>
+</thead>
+<tbody class="ltx_tbody">
+<tr class="ltx_tr" id="S5.T1.2.4.1">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row ltx_border_t" id="S5.T1.2.4.1.1">Standard MHA</th>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T1.2.4.1.2">86.2</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T1.2.4.1.3">93.5</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T1.2.4.1.4">24.3</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T1.2.4.1.5">28.7</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T1.2.4.1.6">88.4</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T1.2.4.1.7">15.2</td>
+</tr>
+<tr class="ltx_tr" id="S5.T1.2.5.2">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row" id="S5.T1.2.5.2.1">Longformer</th>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.5.2.2">85.7</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.5.2.3">92.8</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.5.2.4">23.8</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.5.2.5">27.9</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.5.2.6">87.6</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.5.2.7">9.1</td>
+</tr>
+<tr class="ltx_tr" id="S5.T1.2.6.3">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row" id="S5.T1.2.6.3.1">BigBird</th>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.6.3.2">85.9</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.6.3.3">93.1</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.6.3.4">23.5</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.6.3.5">28.1</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.6.3.6">87.9</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.6.3.7">10.3</td>
+</tr>
+<tr class="ltx_tr" id="S5.T1.2.7.4">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row" id="S5.T1.2.7.4.1">Reformer</th>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.7.4.2">84.3</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.7.4.3">91.7</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.7.4.4">25.6</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.7.4.5">26.4</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.7.4.6">85.2</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.7.4.7">7.8</td>
+</tr>
+<tr class="ltx_tr" id="S5.T1.2.8.5">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row" id="S5.T1.2.8.5.1">Performer</th>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.8.5.2">85.1</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.8.5.3">92.4</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.8.5.4">24.9</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.8.5.5">27.3</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.8.5.6">86.7</td>
+<td class="ltx_td ltx_align_center" id="S5.T1.2.8.5.7">8.5</td>
+</tr>
+<tr class="ltx_tr" id="S5.T1.2.9.6">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row ltx_border_b" id="S5.T1.2.9.6.1"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.1.1">MAHA (Ours)</span></th>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T1.2.9.6.2"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.2.1">86.0</span></td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T1.2.9.6.3"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.3.1">93.3</span></td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T1.2.9.6.4"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.4.1">23.1</span></td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T1.2.9.6.5"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.5.1">28.5</span></td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T1.2.9.6.6"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.6.1">88.2</span></td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T1.2.9.6.7"><span class="ltx_text ltx_font_bold" id="S5.T1.2.9.6.7.1">6.7</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="ltx_flex_break"></div>
+<div class="ltx_flex_cell ltx_flex_size_1">
+<p class="ltx_p ltx_figure_panel ltx_align_center" id="S5.T1.6"><span class="ltx_text ltx_font_italic" id="S5.T1.6.1" style="font-size:90%;">Note: MAHA achieves lowest perplexity on PG-19 and significant memory reduction.</span></p>
+</div>
+</div>
+</figure>
+</section>
+<section class="ltx_subsection" id="S5.SS3">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S5.SS3.5.1.1">V-C</span> </span><span class="ltx_text ltx_font_italic" id="S5.SS3.6.2">Computational Efficiency Analysis</span>
+</h3>
+<div class="ltx_para" id="S5.SS3.p1">
+<p class="ltx_p" id="S5.SS3.p1.1">MAHA matches MHA performance (within 0.2%) while reducing memory by 56%. On PG-19, MAHA achieves lowest perplexity (23.1), outperforming sparse models. Throughput is highest (71 seq/s), making MAHA ideal for high-volume inference. We analyzed the theoretical complexity (FLOPs) relative to sequence length. As illustrated in Figure <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.F3" title="Figure 3 ‣ V-C Computational Efficiency Analysis ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">3</span></a>, MAHA demonstrates near-linear scaling compared to the quadratic baseline of standard attention.</p>
+</div>
+<figure class="ltx_figure" id="S5.F3"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="441" id="S5.F3.g1" src="x3.png" width="747"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" id="S5.F3.4.2.1" style="font-size:90%;">Figure 3</span>: </span><span class="ltx_text" id="S5.F3.2.1" style="font-size:90%;">Attention FLOPs vs Sequence Length. MAHA exhibits an 81% reduction in FLOPs at <math alttext="N=4096" class="ltx_Math" display="inline" id="S5.F3.2.1.m1" intent=":literal"><semantics><mrow><mi>N</mi><mo>=</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">N=4096</annotation></semantics></math> compared to Standard MHA. The gap widens exponentially with longer sequences.</span></figcaption>
+</figure>
+<div class="ltx_para" id="S5.SS3.p2">
+<p class="ltx_p" id="S5.SS3.p2.4">At <math alttext="N=4096" class="ltx_Math" display="inline" id="S5.SS3.p2.1.m1" intent=":literal"><semantics><mrow><mi>N</mi><mo>=</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">N=4096</annotation></semantics></math>, MHA requires <math alttext="\approx" class="ltx_Math" display="inline" id="S5.SS3.p2.2.m2" intent=":literal"><semantics><mo>≈</mo><annotation encoding="application/x-tex">\approx</annotation></semantics></math> 16.8M FLOPs vs MAHA <math alttext="\approx" class="ltx_Math" display="inline" id="S5.SS3.p2.3.m3" intent=":literal"><semantics><mo>≈</mo><annotation encoding="application/x-tex">\approx</annotation></semantics></math> 3.2M FLOPs (81% reduction). This efficiency stems from hierarchical compression avoiding full <math alttext="N\times N" class="ltx_Math" display="inline" id="S5.SS3.p2.4.m4" intent=":literal"><semantics><mrow><mi>N</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">N\times N</annotation></semantics></math> attention. This gap widens exponentially as the sequence length increases, confirming MAHA’s suitability for long-context applications.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S5.SS4">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S5.SS4.5.1.1">V-D</span> </span><span class="ltx_text ltx_font_italic" id="S5.SS4.6.2">Ablation Studies</span>
+</h3>
+<div class="ltx_para" id="S5.SS4.p1">
+<p class="ltx_p" id="S5.SS4.p1.1">We evaluated the impact of aggregation methods and scale configurations.</p>
+</div>
+<section class="ltx_subsubsection" id="S5.SS4.SSS1">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection"><span class="ltx_text" id="S5.SS4.SSS1.5.1.1">V-D</span>1 </span>Aggregation Strategy Comparison</h4>
+<div class="ltx_para" id="S5.SS4.SSS1.p1">
+<p class="ltx_p" id="S5.SS4.SSS1.p1.1">To further analyze the training dynamics, Figure <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.F4" title="Figure 4 ‣ V-D1 Aggregation Strategy Comparison ‣ V-D Ablation Studies ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">4</span></a> depicts the loss convergence curves for both aggregation strategies. While both methods converge stably, the Nash Equilibrium (Orange) strategy achieves a marginally lower loss value in later epochs compared to Convex Optimization (Blue).</p>
+</div>
+<figure class="ltx_figure" id="S5.F4"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="337" id="S5.F4.g1" src="fig4.png" width="539"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" id="S5.F4.2.1.1" style="font-size:90%;">Figure 4</span>: </span><span class="ltx_text" id="S5.F4.3.2" style="font-size:90%;">Training loss convergence comparison: Convex Optimization vs Nash Equilibrium.</span></figcaption>
+</figure>
+<div class="ltx_para" id="S5.SS4.SSS1.p2">
+<p class="ltx_p" id="S5.SS4.SSS1.p2.1">Table <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.T2" title="TABLE II ‣ V-D1 Aggregation Strategy Comparison ‣ V-D Ablation Studies ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">II</span></a> shows that while Convex Optimization (CO) is faster (1.0x), Nash Equilibrium (NE) provides robust performance at a slight cost (0.9x speed).</p>
+</div>
+<figure class="ltx_table" id="S5.T2">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_table"><span class="ltx_text" id="S5.T2.2.1.1" style="font-size:90%;">TABLE II</span>: </span><span class="ltx_text" id="S5.T2.3.2" style="font-size:90%;">Aggregation Method Impact on MNLI Task.</span></figcaption>
+<table class="ltx_tabular ltx_centering ltx_guessed_headers ltx_align_middle" id="S5.T2.4">
+<thead class="ltx_thead">
+<tr class="ltx_tr" id="S5.T2.4.1.1">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_column ltx_th_row ltx_border_t" id="S5.T2.4.1.1.1"><span class="ltx_text ltx_font_bold" id="S5.T2.4.1.1.1.1">Method</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T2.4.1.1.2"><span class="ltx_text ltx_font_bold" id="S5.T2.4.1.1.2.1">MNLI (Acc)</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T2.4.1.1.3"><span class="ltx_text ltx_font_bold" id="S5.T2.4.1.1.3.1">Memory (GB)</span></th>
+<th class="ltx_td ltx_align_center ltx_th ltx_th_column ltx_border_t" id="S5.T2.4.1.1.4"><span class="ltx_text ltx_font_bold" id="S5.T2.4.1.1.4.1">Speed</span></th>
+</tr>
+</thead>
+<tbody class="ltx_tbody">
+<tr class="ltx_tr" id="S5.T2.4.2.1">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row ltx_border_t" id="S5.T2.4.2.1.1">Convex Opt. (CO)</th>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T2.4.2.1.2">86.0</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T2.4.2.1.3">6.7</td>
+<td class="ltx_td ltx_align_center ltx_border_t" id="S5.T2.4.2.1.4">1.0x</td>
+</tr>
+<tr class="ltx_tr" id="S5.T2.4.3.2">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row" id="S5.T2.4.3.2.1">Nash Eq. (NE)</th>
+<td class="ltx_td ltx_align_center" id="S5.T2.4.3.2.2">85.8</td>
+<td class="ltx_td ltx_align_center" id="S5.T2.4.3.2.3">6.9</td>
+<td class="ltx_td ltx_align_center" id="S5.T2.4.3.2.4">0.9x</td>
+</tr>
+<tr class="ltx_tr" id="S5.T2.4.4.3">
+<th class="ltx_td ltx_align_left ltx_th ltx_th_row ltx_border_b" id="S5.T2.4.4.3.1">Mean Aggregation</th>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T2.4.4.3.2">85.2</td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T2.4.4.3.3">7.2</td>
+<td class="ltx_td ltx_align_center ltx_border_b" id="S5.T2.4.4.3.4">1.1x</td>
+</tr>
+</tbody>
+</table>
+</figure>
+</section>
+<section class="ltx_subsubsection" id="S5.SS4.SSS2">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection"><span class="ltx_text" id="S5.SS4.SSS2.5.1.1">V-D</span>2 </span>Scale Configuration Analysis</h4>
+<div class="ltx_para" id="S5.SS4.SSS2.p1">
+<p class="ltx_p" id="S5.SS4.SSS2.p1.4">We analyzed how the depth of the hierarchy (number of scales, <math alttext="L" class="ltx_Math" display="inline" id="S5.SS4.SSS2.p1.1.m1" intent=":literal"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>) affects model performance. As illustrated in Figure <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.F5" title="Figure 5 ‣ V-D2 Scale Configuration Analysis ‣ V-D Ablation Studies ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">5</span></a>, optimal results are observed at <math alttext="L=4" class="ltx_Math" display="inline" id="S5.SS4.SSS2.p1.2.m2" intent=":literal"><semantics><mrow><mi>L</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">L=4</annotation></semantics></math>, balancing granularity and context. Using too few scales (<math alttext="L=2" class="ltx_Math" display="inline" id="S5.SS4.SSS2.p1.3.m3" intent=":literal"><semantics><mrow><mi>L</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">L=2</annotation></semantics></math>) results in insufficient detail (Acc: 84.5%), while excessive downsampling (<math alttext="L=6" class="ltx_Math" display="inline" id="S5.SS4.SSS2.p1.4.m4" intent=":literal"><semantics><mrow><mi>L</mi><mo>=</mo><mn>6</mn></mrow><annotation encoding="application/x-tex">L=6</annotation></semantics></math>) introduces noise (Acc: 84.8%).</p>
+</div>
+<figure class="ltx_figure" id="S5.F5"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="357" id="S5.F5.g1" src="x4.png" width="581"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" id="S5.F5.6.3.1" style="font-size:90%;">Figure 5</span>: </span><span class="ltx_text" id="S5.F5.4.2" style="font-size:90%;">MNLI Accuracy vs Number of Hierarchical Scales (<math alttext="L" class="ltx_Math" display="inline" id="S5.F5.3.1.m1" intent=":literal"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>). Optimal performance is at <math alttext="L=4" class="ltx_Math" display="inline" id="S5.F5.4.2.m2" intent=":literal"><semantics><mrow><mi>L</mi><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">L=4</annotation></semantics></math>.</span></figcaption>
+</figure>
+</section>
+</section>
+<section class="ltx_subsection" id="S5.SS5">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S5.SS5.5.1.1">V-E</span> </span><span class="ltx_text ltx_font_italic" id="S5.SS5.6.2">Qualitative Analysis</span>
+</h3>
+<div class="ltx_para" id="S5.SS5.p1">
+<p class="ltx_p" id="S5.SS5.p1.1">To interpret the internal representations learned by MAHA, we visualized the attention weights across different hierarchical scales. Figure <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.F6" title="Figure 6 ‣ V-E Qualitative Analysis ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">6</span></a> displays the heatmap of attention matrices.</p>
+</div>
+<figure class="ltx_figure" id="S5.F6"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="216" id="S5.F6.g1" src="x5.png" width="664"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" id="S5.F6.2.1.1" style="font-size:90%;">Figure 6</span>: </span><span class="ltx_text" id="S5.F6.3.2" style="font-size:90%;">Visualization of Learned Multiscale Attention Patterns. Darker regions indicate higher attention weights.</span></figcaption>
+</figure>
+<div class="ltx_para" id="S5.SS5.p2">
+<p class="ltx_p" id="S5.SS5.p2.1">Several key observations can be drawn:</p>
+<ol class="ltx_enumerate" id="S5.I4">
+<li class="ltx_item" id="S5.I4.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">1.</span>
+<div class="ltx_para" id="S5.I4.i1.p1">
+<p class="ltx_p" id="S5.I4.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I4.i1.p1.1.1">Fine Scales (Scale 1):</span> Exhibits a strong diagonal tendency, capturing local syntax like adjective-noun pairs.</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I4.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">2.</span>
+<div class="ltx_para" id="S5.I4.i2.p1">
+<p class="ltx_p" id="S5.I4.i2.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I4.i2.p1.1.1">Medium Scales (Scale 2):</span> Shifts towards block-diagonal structures, suggesting clause-level modeling.</p>
+</div>
+</li>
+<li class="ltx_item" id="S5.I4.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">3.</span>
+<div class="ltx_para" id="S5.I4.i3.p1">
+<p class="ltx_p" id="S5.I4.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S5.I4.i3.p1.1.1">Coarse Scales (Scale 3):</span> Attention becomes diffuse with vertical bands, tracking document-level themes regardless of distance.</p>
+</div>
+</li>
+</ol>
+</div>
+</section>
+</section>
+<section class="ltx_section" id="S6">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">VI </span><span class="ltx_text ltx_font_smallcaps" id="S6.1.1">Discussion</span>
+</h2>
+<section class="ltx_subsection" id="S6.SS1">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S6.SS1.5.1.1">VI-A</span> </span><span class="ltx_text ltx_font_italic" id="S6.SS1.6.2">Scalability vs. Implementation Overhead</span>
+</h3>
+<div class="ltx_para" id="S6.SS1.p1">
+<p class="ltx_p" id="S6.SS1.p1.3">Our experiments highlight a critical distinction between algorithmic complexity and implementation overhead. While prototype implementations may exhibit initialization latency, the growth rate is the decisive metric for Large Language Models. Figure <a class="ltx_ref" href="https://arxiv.org/html/2512.14925v2#S5.F3" title="Figure 3 ‣ V-C Computational Efficiency Analysis ‣ V Experiments ‣ Multiscale Aggregated Hierarchical Attention (MAHA): A Game-Theoretic and Optimization-Driven Approach to Efficient Contextual Modeling in Large Language Models"><span class="ltx_text ltx_ref_tag">3</span></a> confirms that MAHA’s computational cost grows linearly (<math alttext="O(N)" class="ltx_Math" display="inline" id="S6.SS1.p1.1.m1" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><mi>N</mi><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(N)</annotation></semantics></math>), whereas standard attention grows quadratically (<math alttext="O(N^{2})" class="ltx_Math" display="inline" id="S6.SS1.p1.2.m2" intent=":literal"><semantics><mrow><mi>O</mi><mo lspace="0em" rspace="0em">​</mo><mrow><mo stretchy="false">(</mo><msup><mi>N</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(N^{2})</annotation></semantics></math>). This implies that for very large sequences (e.g., <math alttext="N\gg 4096" class="ltx_Math" display="inline" id="S6.SS1.p1.3.m3" intent=":literal"><semantics><mrow><mi>N</mi><mo>≫</mo><mn>4096</mn></mrow><annotation encoding="application/x-tex">N\gg 4096</annotation></semantics></math>), MAHA provides a decisive advantage in both speed and memory.</p>
+</div>
+</section>
+<section class="ltx_subsection" id="S6.SS2">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S6.SS2.5.1.1">VI-B</span> </span><span class="ltx_text ltx_font_italic" id="S6.SS2.6.2">Limitations</span>
+</h3>
+<div class="ltx_para" id="S6.SS2.p1">
+<p class="ltx_p" id="S6.SS2.p1.1">While MAHA demonstrates significant improvements in efficiency and modeling, certain limitations warrant discussion:</p>
+<ul class="ltx_itemize" id="S6.I1">
+<li class="ltx_item" id="S6.I1.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S6.I1.i1.p1">
+<p class="ltx_p" id="S6.I1.i1.p1.2">The framework involves additional hyperparameters (e.g., number of scales <math alttext="L" class="ltx_Math" display="inline" id="S6.I1.i1.p1.1.m1" intent=":literal"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>, compression ratio <math alttext="r" class="ltx_Math" display="inline" id="S6.I1.i1.p1.2.m2" intent=":literal"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>) that may require domain-specific tuning.</p>
+</div>
+</li>
+<li class="ltx_item" id="S6.I1.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S6.I1.i2.p1">
+<p class="ltx_p" id="S6.I1.i2.p1.1">Although the Nash Equilibrium aggregation offers theoretical guarantees, its iterative nature imposes a computational overhead during training compared to the closed-form Convex Optimization (CO) solution.</p>
+</div>
+</li>
+<li class="ltx_item" id="S6.I1.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S6.I1.i3.p1">
+<p class="ltx_p" id="S6.I1.i3.p1.1">The method assumes that linguistic information is inherently hierarchical; this assumption may not fully capture certain non-compositional semantic relationships or dispersed references in highly unstructured text <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">rapaport1994a</span>]</cite>.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<section class="ltx_subsection" id="S6.SS3">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S6.SS3.5.1.1">VI-C</span> </span><span class="ltx_text ltx_font_italic" id="S6.SS3.6.2">Potential Application Scenarios</span>
+</h3>
+<div class="ltx_para" id="S6.SS3.p1">
+<p class="ltx_p" id="S6.SS3.p1.1">The versatility of MAHA extends beyond standard NLP:</p>
+<ul class="ltx_itemize" id="S6.I2">
+<li class="ltx_item" id="S6.I2.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S6.I2.i1.p1">
+<p class="ltx_p" id="S6.I2.i1.p1.1"><span class="ltx_text ltx_font_bold" id="S6.I2.i1.p1.1.1">Genomics:</span> In genomic sequence analysis, where identifying long-range dependencies in megabase-scale DNA sequences is critical <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">choi2023a</span>]</cite>, MAHA’s multiscale attention could enhance variant calling accuracy.</p>
+</div>
+</li>
+<li class="ltx_item" id="S6.I2.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S6.I2.i2.p1">
+<p class="ltx_p" id="S6.I2.i2.p1.1"><span class="ltx_text ltx_font_bold" id="S6.I2.i2.p1.1.1">Multimodal Learning:</span> For video-text retrieval, the hierarchical scales align naturally with temporal video resolutions (frames, shots, scenes) <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">liu2021a</span>]</cite>, offering a unified attention mechanism for cross-modal alignment.</p>
+</div>
+</li>
+<li class="ltx_item" id="S6.I2.i3" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="S6.I2.i3.p1">
+<p class="ltx_p" id="S6.I2.i3.p1.1"><span class="ltx_text ltx_font_bold" id="S6.I2.i3.p1.1.1">Federated Learning:</span> The optimization-driven aggregation is particularly relevant for federated settings where clients may operate on data of varying granularities or qualities <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">chen2020a</span>]</cite>.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<section class="ltx_subsection" id="S6.SS4">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection"><span class="ltx_text" id="S6.SS4.5.1.1">VI-D</span> </span><span class="ltx_text ltx_font_italic" id="S6.SS4.6.2">Ethical Considerations</span>
+</h3>
+<div class="ltx_para" id="S6.SS4.p1">
+<p class="ltx_p" id="S6.SS4.p1.1">The efficiency gains of MAHA present a dual-edged sword. While significantly reducing the carbon footprint per training run <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">strubell2019a</span>]</cite>, lower costs may paradoxically incentivize the training of even larger, redundant models (Jevons paradox). Furthermore, the hierarchical aggregation introduces interpretability challenges; while individual scales are transparent, the complex interplay of optimization weights may obscure the models decision-making path <cite class="ltx_cite ltx_citemacro_cite">[<span class="ltx_ref ltx_missing_citation ltx_ref_self">danilevsky2021a</span>]</cite>. Future work must address these transparency issues to ensure responsible deployment.</p>
+</div>
+</section>
+</section>
+<section class="ltx_section" id="S7">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">VII </span><span class="ltx_text ltx_font_smallcaps" id="S7.1.1">Conclusion</span>
+</h2>
+<div class="ltx_para" id="S7.p1">
+<p class="ltx_p" id="S7.p1.1">In this paper, we introduced Multiscale Aggregated Hierarchical Attention (MAHA), a novel framework that fundamentally rethinks attention mechanisms in LLMs through the lens of multiscale analysis and optimization theory. By decomposing sequences into hierarchical granularities and synthesizing them via convex optimization or game-theoretic equilibrium, MAHA addresses the critical bottleneck of quadratic complexity without compromising contextual fidelity.</p>
+</div>
+<div class="ltx_para" id="S7.p2">
+<p class="ltx_p" id="S7.p2.1">Our extensive empirical evaluation demonstrates that MAHA achieves state-of-the-art performance on long-context modeling (PG-19) and machine translation, while reducing memory usage by up to 56% compared to standard transformers. The proposed hybrid dilated-convolutional architecture serves as a drop-in replacement for existing attention layers, facilitating seamless adoption.</p>
+</div>
+<div class="ltx_para" id="S7.p3">
+<p class="ltx_p" id="S7.p3.1">Looking forward, MAHA paves the way for scalable foundation models in resource-constrained environments. We envision future research extending this rigorous aggregation paradigm to other modalities such as computer vision and speech processing, where multiscale representation is equally paramount. Ultimately, this work underscores the potential of integrating mathematical optimization principles into deep learning architectures to build more efficient, robust, and theoretically grounded AI systems.</p>
+</div>
+</section>
+<section class="ltx_section" id="Sx1">
+<h2 class="ltx_title ltx_font_smallcaps ltx_title_section">Data Availability</h2>
+<div class="ltx_para" id="Sx1.p1">
+<p class="ltx_p" id="Sx1.p1.1">The source code and pretrained models for MAHA are publicly available at <a class="ltx_ref ltx_url ltx_font_typewriter" href="https://github.com/canererden/MAHA-Project" title="">https://github.com/canererden/MAHA-Project</a> with the permanent digital object identifier <span class="ltx_text ltx_font_bold" id="Sx1.p1.1.1">DOI: 10.5281/zenodo.17936753</span>.</p>
+</div>
+</section>
+</article>
+</div>
+<footer class="ltx_page_footer">
+<div class="ltx_page_logo">Generated  on Thu Dec 18 14:12:19 2025 by <a class="ltx_LaTeXML_logo" href="http://dlmf.nist.gov/LaTeXML/"><span style="letter-spacing:-0.2em; margin-right:0.1em;">L<span class="ltx_font_smallcaps" style="position:relative; bottom:2.2pt;">a</span>T<span class="ltx_font_smallcaps" style="font-size:120%;position:relative; bottom:-0.2ex;">e</span></span><span style="font-size:90%; position:relative; bottom:-0.2ex;">XML</span><img alt="Mascot Sammy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg=="/></a>
+</div></footer>
+</div>
+</body>
+</html>
