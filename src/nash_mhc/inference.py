@@ -98,7 +98,8 @@ def main() -> None:
     print(f"Generating {args.max_tokens} tokens...")
     print("-" * 50)
 
-    input_ids = jnp.array([[hf_tokenizer.encode(args.prompt)]])
+    prompt_ids = hf_tokenizer.encode(args.prompt)
+    input_ids = jnp.array([prompt_ids], dtype=jnp.int32)
 
     generated = generate(state, input_ids, TPU_V6E_MEDIUM_CONFIG, args.max_tokens)
 
@@ -107,6 +108,8 @@ def main() -> None:
 
     print("\n" + "=" * 50)
     print("Generated:")
+    print("=" * 50)
+    print(output_text)
     print("=" * 50)
     print(output_text)
     print("=" * 50)
