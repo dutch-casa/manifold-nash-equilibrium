@@ -19,6 +19,12 @@ from nash_mhc.types.configs import (
     SINGLE_TPU_TRAINING_CONFIG,
     TPU_V6E_SMALL_CONFIG,
     TPU_V6E_SMALL_TRAINING_CONFIG,
+    TPU_V6E_MEDIUM_CONFIG,
+    TPU_V6E_MEDIUM_TRAINING_CONFIG,
+    TPU_V6E_BIG_CONFIG,
+    TPU_V6E_BIG_TRAINING_CONFIG,
+    TPU_V6E_MAX_CONFIG,
+    TPU_V6E_MAX_TRAINING_CONFIG,
     ModelConfig,
     TrainingConfig,
 )
@@ -84,9 +90,11 @@ def parse_args() -> argparse.Namespace:
         "--worker-buffer-size", type=int, default=16, help="Prefetch buffer per worker"
     )
     parser.add_argument(
-        "--use-small-model",
-        action="store_true",
-        help="Use smaller model config for TPU v6e-1 (31GB HBM)",
+        "--model-size",
+        type=str,
+        default="default",
+        choices=["default", "small", "medium", "big", "max"],
+        help="Model size preset: default(1.5B), small(97M), medium(230M), big(550M), max(800M)",
     )
 
     return parser.parse_args()
@@ -95,16 +103,26 @@ def parse_args() -> argparse.Namespace:
 def build_model_config(
     args: argparse.Namespace, vocab_size: int, max_seq_len: int
 ) -> ModelConfig:
-    base = TPU_V6E_SMALL_CONFIG if args.use_small_model else DEFAULT_MODEL_CONFIG
+    model_config_map = {
+        "default": DEFAULT_MODEL_CONFIG,
+        "small": TPU_V6E_SMALL_CONFIG,
+        "medium": TPU_V6E_MEDIUM_CONFIG,
+        "big": TPU_V6E_BIG_CONFIG,
+        "max": TPU_V6E_MAX_CONFIG,
+    }
+    base = model_config_map[args.model_size]
     return replace(base, vocab_size=vocab_size, max_seq_len=max_seq_len)
 
 
 def build_training_config(args: argparse.Namespace) -> TrainingConfig:
-    base = (
-        TPU_V6E_SMALL_TRAINING_CONFIG
-        if args.use_small_model
-        else SINGLE_TPU_TRAINING_CONFIG
-    )
+    training_config_map = {
+        "default": SINGLE_TPU_TRAINING_CONFIG,
+        "small": TPU_V6E_SMALL_TRAINING_CONFIG,
+        "medium": TPU_V6E_MEDIUM_TRAINING_CONFIG,
+        "big": TPU_V6E_BIG_TRAINING_CONFIG,
+        "max": TPU_V6E_MAX_TRAINING_CONFIG,
+    }
+    base = training_config_map[args.model_size]
     overrides = {}
     if args.batch_size is not None:
         overrides["batch_size"] = args.batch_size
@@ -151,9 +169,14 @@ def main() -> None:
     if hf_tokenizer.pad_token_id is None:
         hf_tokenizer.pad_token = hf_tokenizer.eos_token
 
-    base_model_config = (
-        TPU_V6E_SMALL_CONFIG if args.use_small_model else DEFAULT_MODEL_CONFIG
-    )
+    model_config_map = {
+        "default": DEFAULT_MODEL_CONFIG,
+        "small": TPU_V6E_SMALL_CONFIG,
+        "medium": TPU_V6E_MEDIUM_CONFIG,
+        "big": TPU_V6E_BIG_CONFIG,
+        "max": TPU_V6E_MAX_CONFIG,
+    }
+    base_model_config = model_config_map[args.model_size]
     raw_vocab = len(hf_tokenizer)
     aligned_vocab = round_vocab_size(raw_vocab)
     aligned_seq_len = round_seq_len(
