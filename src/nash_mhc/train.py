@@ -133,16 +133,15 @@ def round_seq_len(
 def main() -> None:
     args = parse_args()
 
-    device = jax.devices()[0]
-    jax.config.update("jax_default_device", device)
-
+    devices = jax.devices()
     print(f"JAX process {jax.process_index()} / {jax.process_count()} started.")
-    print(f"Device: {device}")
+    print(f"Available devices ({len(devices)}): {devices}")
 
+    device = devices[0]
     memory_stats = device.memory_stats()
     gb_used = memory_stats.get("bytes_in_use", 0) / (1024**3)
     gb_peak = memory_stats.get("peak_bytes_in_use", 0) / (1024**3)
-    print(f"TPU HBM: {gb_used:.2f} GB used / {gb_peak:.2f} GB peak")
+    print(f"TPU HBM: {gb_used:.2f} GB used / {gb_peak:.2f} GB peak (per device)")
 
     key = jax.random.PRNGKey(args.seed)
     key, model_key = jax.random.split(key)
@@ -241,7 +240,7 @@ def main() -> None:
             step_times.pop(0)
 
         avg_step_time = sum(step_times) / len(step_times)
-        throughput = training_config.batch_size / avg_step_time
+        throughput = training_config.effective_batch_size / avg_step_time
 
         current_lr = training_config.learning_rate
         if training_config.warmup_steps > 0:

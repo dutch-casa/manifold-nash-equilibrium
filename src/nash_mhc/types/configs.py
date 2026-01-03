@@ -176,7 +176,6 @@ SINGLE_TPU_TRAINING_CONFIG = TrainingConfig(
     seed=42,
 )
 
-# Smaller model configuration for TPU v6e-1 (31GB HBM)
 TPU_V6E_SMALL_CONFIG = ModelConfig(
     vocab_size=32768,
     max_seq_len=512,
@@ -197,6 +196,87 @@ TPU_V6E_SMALL_TRAINING_CONFIG = TrainingConfig(
     gradient_accumulation_steps=4,
     learning_rate=3e-4,
     warmup_steps=1000,
+    total_steps=50000,
+    weight_decay=0.1,
+    max_grad_norm=1.0,
+    lambda_sparsity=0.01,
+    seed=42,
+)
+
+TPU_V6E_MEDIUM_CONFIG = ModelConfig(
+    vocab_size=32768,
+    max_seq_len=1024,
+    d_model=768,
+    num_heads=12,
+    num_layers=12,
+    num_scales=3,
+    compression_ratio=2,
+    ffn_multiplier=2.67,
+    sinkhorn_iterations=10,
+    nash_iterations=3,
+    aggregation="nash",
+    dtype="bfloat16",
+)
+
+TPU_V6E_MEDIUM_TRAINING_CONFIG = TrainingConfig(
+    batch_size=64,
+    gradient_accumulation_steps=1,
+    learning_rate=3e-4,
+    warmup_steps=2000,
+    total_steps=50000,
+    weight_decay=0.1,
+    max_grad_norm=1.0,
+    lambda_sparsity=0.01,
+    seed=42,
+)
+
+TPU_V6E_BIG_CONFIG = ModelConfig(
+    vocab_size=32768,
+    max_seq_len=1024,
+    d_model=768,
+    num_heads=12,
+    num_layers=24,
+    num_scales=3,
+    compression_ratio=2,
+    ffn_multiplier=2.67,
+    sinkhorn_iterations=10,
+    nash_iterations=3,
+    aggregation="nash",
+    dtype="bfloat16",
+)
+
+TPU_V6E_BIG_TRAINING_CONFIG = TrainingConfig(
+    batch_size=32,
+    gradient_accumulation_steps=2,
+    learning_rate=3e-4,
+    warmup_steps=3000,
+    total_steps=50000,
+    weight_decay=0.1,
+    max_grad_norm=1.0,
+    lambda_sparsity=0.01,
+    seed=42,
+)
+
+TPU_V6E_MAX_CONFIG = ModelConfig(
+    vocab_size=32768,
+    max_seq_len=2048,
+    d_model=1024,
+    num_heads=16,
+    num_layers=24,
+    num_scales=3,
+    compression_ratio=2,
+    ffn_multiplier=2.67,
+    sinkhorn_iterations=10,
+    nash_iterations=3,
+    aggregation="nash",
+    dtype="bfloat16",
+)
+
+TPU_V6E_MAX_TRAINING_CONFIG = TrainingConfig(
+    batch_size=16,
+    gradient_accumulation_steps=4,
+    learning_rate=3e-4,
+    warmup_steps=5000,
     total_steps=50000,
     weight_decay=0.1,
     max_grad_norm=1.0,
