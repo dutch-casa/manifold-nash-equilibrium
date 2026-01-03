@@ -14,6 +14,7 @@ from nash_mhc.types.configs import TPU_V6E_MEDIUM_CONFIG, TPU_V6E_MEDIUM_TRAININ
 
 
 def load_model(checkpoint_dir: str, model_config, training_config):
+    """Load model from checkpoint."""
     checkpoint_manager = OrbaxCheckpointManager(checkpoint_dir)
 
     print(f"Initializing model from {checkpoint_dir}...")
@@ -33,16 +34,15 @@ def load_model(checkpoint_dir: str, model_config, training_config):
 
 
 @jax.jit
-def generate(
-    state: TrainState, input_ids: jnp.ndarray, model_config, max_tokens: int = 100
-):
+def generate(state: TrainState, input_ids: jnp.ndarray, config, max_tokens: int = 100):
+    """Generate text autoregressively."""
     batch_size, seq_len = input_ids.shape
 
     generated = input_ids
 
     for _ in range(max_tokens):
         model = state.model
-        inputs = generated[:, -model_config.max_seq_len :]
+        inputs = generated[:, -config.max_seq_len :]
 
         logits, _ = model(inputs, causal=False)
 
