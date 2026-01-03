@@ -17,6 +17,8 @@ from nash_mhc.training.checkpoint import OrbaxCheckpointManager
 from nash_mhc.types.configs import (
     DEFAULT_MODEL_CONFIG,
     SINGLE_TPU_TRAINING_CONFIG,
+    TPU_V6E_SMALL_CONFIG,
+    TPU_V6E_SMALL_TRAINING_CONFIG,
     ModelConfig,
     TrainingConfig,
 )
@@ -81,6 +83,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--worker-buffer-size", type=int, default=16, help="Prefetch buffer per worker"
     )
+    parser.add_argument(
+        "--use-small-model",
+        action="store_true",
+        help="Use smaller model config for TPU v6e-1 (31GB HBM)",
+    )
 
     return parser.parse_args()
 
@@ -88,11 +95,16 @@ def parse_args() -> argparse.Namespace:
 def build_model_config(
     args: argparse.Namespace, vocab_size: int, max_seq_len: int
 ) -> ModelConfig:
-    return replace(DEFAULT_MODEL_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
+    base = TPU_V6E_SMALL_CONFIG if args.use_small_model else DEFAULT_MODEL_CONFIG
+    return replace(base, vocab_size=vocab_size, max_seq_len=max_seq_len)
 
 
 def build_training_config(args: argparse.Namespace) -> TrainingConfig:
-    base = SINGLE_TPU_TRAINING_CONFIG
+    base = (
+        TPU_V6E_SMALL_TRAINING_CONFIG
+        if args.use_small_model
+        else SINGLE_TPU_TRAINING_CONFIG
+    )
     overrides = {}
     if args.batch_size is not None:
         overrides["batch_size"] = args.batch_size

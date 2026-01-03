@@ -175,3 +175,31 @@ SINGLE_TPU_TRAINING_CONFIG = TrainingConfig(
     lambda_sparsity=0.01,
     seed=42,
 )
+
+# Smaller model configuration for TPU v6e-1 (31GB HBM)
+TPU_V6E_SMALL_CONFIG = ModelConfig(
+    vocab_size=32768,
+    max_seq_len=512,
+    d_model=512,
+    num_heads=8,
+    num_layers=8,
+    num_scales=3,
+    compression_ratio=2,
+    ffn_multiplier=2.67,
+    sinkhorn_iterations=10,
+    nash_iterations=3,
+    aggregation="nash",
+    dtype="bfloat16",
+)
+
+TPU_V6E_SMALL_TRAINING_CONFIG = TrainingConfig(
+    batch_size=16,
+    gradient_accumulation_steps=4,
+    learning_rate=3e-4,
+    warmup_steps=1000,
+    total_steps=50000,
+    weight_decay=0.1,
+    max_grad_norm=1.0,
+    lambda_sparsity=0.01,
+    seed=42,
+)
