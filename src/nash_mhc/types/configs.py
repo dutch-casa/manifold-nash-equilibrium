@@ -137,40 +137,25 @@ class TrainingConfig:
 DEFAULT_MODEL_CONFIG = ModelConfig(
     vocab_size=32768,
     max_seq_len=2048,
-    d_model=2048,
-    num_heads=16,
-    num_layers=24,
-    num_scales=4,
-    compression_ratio=2,
-    ffn_multiplier=2.67,
-    sinkhorn_iterations=10,
-    nash_iterations=3,
-    aggregation="nash",
-    dtype="bfloat16",
-)
-
-SMALL_MODEL_CONFIG = ModelConfig(
-    vocab_size=32768,
-    max_seq_len=512,
-    d_model=512,
-    num_heads=8,
-    num_layers=6,
+    d_model=768,
+    num_heads=12,
+    num_layers=12,
     num_scales=3,
     compression_ratio=2,
     ffn_multiplier=2.67,
     sinkhorn_iterations=10,
     nash_iterations=3,
     aggregation="nash",
-    dtype="float32",
+    dtype="bfloat16",
 )
 
-MEDIUM_1_5B_CONFIG = ModelConfig(
-    vocab_size=65536,
-    max_seq_len=4096,
-    d_model=1600,
-    num_heads=16,
-    num_layers=14,
-    num_scales=4,
+SINGLE_TPU_CONFIG = ModelConfig(
+    vocab_size=32768,
+    max_seq_len=2048,
+    d_model=768,
+    num_heads=12,
+    num_layers=12,
+    num_scales=3,
     compression_ratio=2,
     ffn_multiplier=2.67,
     sinkhorn_iterations=10,
@@ -179,39 +164,12 @@ MEDIUM_1_5B_CONFIG = ModelConfig(
     dtype="bfloat16",
 )
 
-LARGE_3B_CONFIG = ModelConfig(
-    vocab_size=65536,
-    max_seq_len=4096,
-    d_model=2048,
-    num_heads=16,
-    num_layers=28,
-    num_scales=4,
-    compression_ratio=2,
-    ffn_multiplier=2.67,
-    sinkhorn_iterations=10,
-    nash_iterations=3,
-    aggregation="nash",
-    dtype="bfloat16",
-)
-
-LARGE_3B_TRAINING_CONFIG = TrainingConfig(
-    batch_size=32,
-    gradient_accumulation_steps=8,
+SINGLE_TPU_TRAINING_CONFIG = TrainingConfig(
+    batch_size=8,
+    gradient_accumulation_steps=16,
     learning_rate=3e-4,
-    warmup_steps=2000,
-    total_steps=100000,
-    weight_decay=0.1,
-    max_grad_norm=1.0,
-    lambda_sparsity=0.01,
-    seed=42,
-)
-
-MEDIUM_1_5B_TRAINING_CONFIG = TrainingConfig(
-    batch_size=32,
-    gradient_accumulation_steps=8,
-    learning_rate=3e-4,
-    warmup_steps=2000,
-    total_steps=100000,
+    warmup_steps=1000,
+    total_steps=50000,
     weight_decay=0.1,
     max_grad_norm=1.0,
     lambda_sparsity=0.01,

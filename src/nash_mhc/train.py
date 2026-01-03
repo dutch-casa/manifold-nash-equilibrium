@@ -17,14 +17,11 @@ from nash_mhc.data.loader import LoaderConfig
 from nash_mhc.data.streaming import StreamingConfig, create_streaming_dataloader
 from nash_mhc.data.tokenizer import TokenizerAdapter, TokenizerConfig
 from nash_mhc.models.backbone import MAHALanguageModel
-from nash_mhc.sharding.mesh import create_adaptive_mesh, mesh_context
-from nash_mhc.sharding.shard import shard_train_state, shard_input
 from nash_mhc.training.loop import init_train_state, train_step
 from nash_mhc.training.checkpoint import OrbaxCheckpointManager
 from nash_mhc.types.configs import (
-    LARGE_3B_CONFIG,
-    LARGE_3B_TRAINING_CONFIG,
-    MEDIUM_1_5B_CONFIG,
+    DEFAULT_MODEL_CONFIG,
+    SINGLE_TPU_TRAINING_CONFIG,
     ModelConfig,
     TrainingConfig,
 )
@@ -73,13 +70,6 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument(
-        "--mesh-data", type=int, default=1, help="Data parallelism axis size"
-    )
-    parser.add_argument("--mesh-fsdp", type=int, default=1, help="FSDP axis size")
-    parser.add_argument(
-        "--mesh-tp", type=int, default=1, help="Tensor parallelism axis size"
-    )
-    parser.add_argument(
         "--log-interval", type=int, default=100, help="Steps between logs"
     )
     parser.add_argument(
@@ -93,20 +83,6 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default="./checkpoints",
         help="Checkpoint directory",
-    )
-
-    parser.add_argument(
-        "--use-small-model",
-        action="store_true",
-        help="Use small config for testing (0.09B)",
-    )
-    parser.add_argument(
-        "--use-3b-model", action="store_true", help="Use 3B config (3.38B)"
-    )
-    parser.add_argument(
-        "--no-shard",
-        action="store_true",
-        help="Disable parameter sharding (for single-device training)",
     )
     parser.add_argument(
         "--resume-from", type=str, default=None, help="Resume from checkpoint path"
@@ -124,28 +100,11 @@ def parse_args() -> argparse.Namespace:
 def build_model_config(
     args: argparse.Namespace, vocab_size: int, max_seq_len: int
 ) -> ModelConfig:
-    if args.use_3b_model:
-        return replace(LARGE_3B_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
-    if args.use_small_model:
-        return ModelConfig(
-            vocab_size=vocab_size,
-            max_seq_len=max_seq_len,
-            d_model=512,
-            num_heads=8,
-            num_layers=6,
-            num_scales=3,
-            compression_ratio=2,
-            ffn_multiplier=2.67,
-            sinkhorn_iterations=10,
-            nash_iterations=3,
-            aggregation="nash",
-            dtype="float32",
-        )
-    return replace(MEDIUM_1_5B_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
+    return replace(DEFAULT_MODEL_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
 
 
 def build_training_config(args: argparse.Namespace) -> TrainingConfig:
-    base = LARGE_3B_TRAINING_CONFIG
+    base = SINGLE_TPU_TRAINING_CONFIG
     overrides = {}
     if args.batch_size is not None:
         overrides["batch_size"] = args.batch_size
@@ -185,16 +144,14 @@ def main() -> None:
     if hf_tokenizer.pad_token_id is None:
         hf_tokenizer.pad_token = hf_tokenizer.eos_token
 
-        num_scales = 3 if args.use_small_model else 4
-        if args.use_3b_model:
-            num_scales = 4
-        compression_ratio = 2
+    num_scales = 3
+    compression_ratio = 2
     raw_vocab = len(hf_tokenizer)
     aligned_vocab = round_vocab_size(raw_vocab)
     aligned_seq_len = round_seq_len(
         hf_tokenizer.model_max_length, num_scales, compression_ratio
     )
-    aligned_seq_len = min(aligned_seq_len, 4096)
+    aligned_seq_len = min(aligned_seq_len, 2048)
 
     tokenizer_config = TokenizerConfig(
         max_length=aligned_seq_len, pad_id=hf_tokenizer.pad_token_id
@@ -204,5 +161,126 @@ def main() -> None:
     model_config = build_model_config(args, aligned_vocab, aligned_seq_len)
     training_config = build_training_config(args)
 
-    print(f"Model: {model_config}")
-    if not (args.use_small_model or args.use_3b_model):\n        model_type = "1.5B (default)" if not (args.use_small_model or args.use_3b_model) else ("0.09B" if args.use_small_model else "3B" if args.use_3b_model\n    print("Model: " + model_type)\n    print("Model config: " + str(model_config))\n    print("Training: " + str(training_config))\n    print("Creating data loader...")\n    stream_config = StreamingConfig(\n        path=args.dataset,\n        name=args.dataset_name,\n        split=args.split,\n        text_field="text",\n        num_workers=args.num_workers,\n        prefetch_buffer_size=args.worker_buffer_size,\n    )\n    loader = create_streaming_dataloader(\n        stream_config,\n        LoaderConfig(\n            batch_size=training_config.batch_size,\n            shuffle_seed=training_config.seed,\n        ),\n        tokenizer,\n    )\n
+    print(f"Model config: {model_config}")
+    print(f"Training config: {training_config}")
+    print("Creating data loader...")
+
+    stream_config = StreamingConfig(
+        path=args.dataset,
+        name=args.dataset_name,
+        split=args.split,
+        text_field="text",
+        num_workers=args.num_workers,
+        prefetch_buffer_size=args.worker_buffer_size,
+    )
+    loader = create_streaming_dataloader(
+        stream_config,
+        LoaderConfig(
+            batch_size=training_config.batch_size,
+            shuffle_seed=training_config.seed,
+        ),
+        tokenizer,
+    )
+
+    print("Initializing model...")
+    model = MAHALanguageModel(model_config, key=model_key)
+    print(f"Model parameters: {model.count_params():,}")
+
+    print("Initializing train state...")
+    state = init_train_state(
+        model, training_config, pad_token_id=hf_tokenizer.pad_token_id
+    )
+
+    if args.resume_from:
+        print(f"Resuming from checkpoint: {args.resume_from}")
+        checkpoint_manager = OrbaxCheckpointManager(args.checkpoint_dir)
+        state = checkpoint_manager.restore(state)
+
+    print("Compiling train step...")
+    train_step_jit = jax.jit(train_step)
+
+    checkpoint_manager = OrbaxCheckpointManager(args.checkpoint_dir)
+
+    print("Starting training...")
+    print(f"Total steps: {training_config.total_steps}")
+    print(f"Effective batch size: {training_config.effective_batch_size}")
+    print(f"Learning rate: {training_config.learning_rate}")
+
+    metrics = TrainMetrics.empty()
+    step_times = []
+    start_time = time.time()
+
+    for step, batch in enumerate(range(training_config.total_steps), start=1):
+        step_start = time.time()
+
+        try:
+            batch = next(iter(loader))
+        except StopIteration:
+            loader = create_streaming_dataloader(
+                stream_config,
+                LoaderConfig(
+                    batch_size=training_config.batch_size,
+                    shuffle_seed=training_config.seed,
+                ),
+                tokenizer,
+            )
+            batch = next(iter(loader))
+
+        state, loss_components = train_step_jit(state, batch)
+
+        step_time = time.time() - step_start
+        step_times.append(step_time)
+        if len(step_times) > 100:
+            step_times.pop(0)
+
+        avg_step_time = sum(step_times) / len(step_times)
+        throughput = training_config.batch_size / avg_step_time
+
+        current_lr = training_config.learning_rate
+        if training_config.warmup_steps > 0:
+            if step <= training_config.warmup_steps:
+                current_lr = current_lr * (step / training_config.warmup_steps)
+            else:
+                decay_steps = training_config.total_steps - training_config.warmup_steps
+                progress = (step - training_config.warmup_steps) / decay_steps
+                current_lr = current_lr * 0.5 * (1 + jnp.cos(jnp.pi * progress))
+
+        metrics = metrics.merge(
+            TrainMetrics(
+                loss=loss_components.total,
+                learning_rate=float(current_lr),
+                throughput=throughput,
+            )
+        )
+
+        if step % args.log_interval == 0:
+            print(
+                f"Step {step}/{training_config.total_steps} | "
+                f"loss: {metrics.loss.compute():.4f} | "
+                f"lr: {metrics.learning_rate.compute():.2e} | "
+                f"throughput: {metrics.throughput.compute():.1f} samples/s | "
+                f"step_time: {avg_step_time:.3f}s"
+            )
+
+        if step % args.checkpoint_interval == 0:
+            print(f"Saving checkpoint at step {step}...")
+            checkpoint_manager.save(
+                state,
+                metrics={
+                    "loss": float(metrics.loss.compute()),
+                    "learning_rate": float(metrics.learning_rate.compute()),
+                    "throughput": float(metrics.throughput.compute()),
+                },
+            )
+
+    total_time = time.time() - start_time
+    print(f"\nTraining complete in {total_time:.1f}s")
+    print(f"Final metrics: {metrics.compute()}")
+
+    checkpoint_manager.save(state)
+    checkpoint_manager.wait_until_finished()
+    checkpoint_manager.close()
+
+
+if __name__ == "__main__":
+    main()

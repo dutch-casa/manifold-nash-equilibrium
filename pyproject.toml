@@ -29,8 +29,6 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "hypothesis>=6.100",
-    # Commented out - not needed for production training
-    # "wandb>=0.23.1",
 ]
 tpu = [
     "jax[tpu]>=0.4.30",
