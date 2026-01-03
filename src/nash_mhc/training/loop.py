@@ -17,7 +17,7 @@ from nash_mhc.types.configs import TrainingConfig
 @struct.dataclass
 class TrainState:
     model: MAHALanguageModel
-    optimizer: optax.GradientTransformation
+    optimizer: optax.GradientTransformation = struct.field(pytree_node=False)
     opt_state: optax.OptState
     step: int
     pad_token_id: int
