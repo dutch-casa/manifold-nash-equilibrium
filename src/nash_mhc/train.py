@@ -134,7 +134,6 @@ def main() -> None:
     args = parse_args()
 
     jax.config.update("jax_default_device", jax.devices()[0])
-    jax.config.update("jax_array", True)
 
     print(f"JAX process {jax.process_index()} / {jax.process_count()} started.")
     print(f"Devices: {jax.devices()}")
