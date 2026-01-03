@@ -111,9 +111,12 @@ class HFStreamingIterDataset(grain.IterDataset[dict[str, np.ndarray]]):
 
 def _to_sequence_batch(batch: dict[str, Any]) -> SequenceBatch:
     """Convert dict batch to SequenceBatch dataclass."""
+    input_ids = np.array(batch["input_ids"])
+    attention_mask = np.array(batch["attention_mask"])
+
     return SequenceBatch(
-        token_ids=jax.numpy.asarray(batch["input_ids"]),
-        attention_mask=jax.numpy.asarray(batch["attention_mask"]),
+        token_ids=jax.numpy.asarray(input_ids),
+        attention_mask=jax.numpy.asarray(attention_mask),
     )
 
 
@@ -130,12 +133,6 @@ def create_streaming_dataloader(
 
     ds = ds.batch(loader_config.batch_size, drop_remainder=loader_config.drop_remainder)
     ds = ds.map(_to_sequence_batch)
-
-    if config.num_workers > 1:
-        ds = grain.experimental.ThreadPrefetchIterDataset(
-            parent=ds,
-            prefetch_buffer_size=config.prefetch_buffer_size,
-        )
 
     return ds
 
