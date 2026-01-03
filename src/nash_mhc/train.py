@@ -152,21 +152,27 @@ def main() -> None:
     if hf_tokenizer.pad_token_id is None:
         hf_tokenizer.pad_token = hf_tokenizer.eos_token
 
-    num_scales = 3
-    compression_ratio = 2
+    base_model_config = (
+        TPU_V6E_SMALL_CONFIG if args.use_small_model else DEFAULT_MODEL_CONFIG
+    )
     raw_vocab = len(hf_tokenizer)
     aligned_vocab = round_vocab_size(raw_vocab)
     aligned_seq_len = round_seq_len(
-        hf_tokenizer.model_max_length, num_scales, compression_ratio
+        hf_tokenizer.model_max_length,
+        base_model_config.num_scales,
+        base_model_config.compression_ratio,
     )
-    aligned_seq_len = min(aligned_seq_len, 2048)
 
     tokenizer_config = TokenizerConfig(
-        max_length=aligned_seq_len, pad_id=hf_tokenizer.pad_token_id
+        max_length=base_model_config.max_seq_len, pad_id=hf_tokenizer.pad_token_id
     )
     tokenizer = TokenizerAdapter(hf_tokenizer, tokenizer_config)
 
-    model_config = build_model_config(args, aligned_vocab, max_seq_len=aligned_seq_len)
+    model_config = build_model_config(
+        args,
+        aligned_vocab,
+        max_seq_len=min(aligned_seq_len, base_model_config.max_seq_len),
+    )
     training_config = build_training_config(args)
 
     print(f"Model config: {model_config}")
