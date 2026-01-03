@@ -24,6 +24,7 @@ from nash_mhc.training.checkpoint import OrbaxCheckpointManager
 from nash_mhc.types.configs import (
     LARGE_3B_CONFIG,
     LARGE_3B_TRAINING_CONFIG,
+    MEDIUM_1_5B_CONFIG,
     ModelConfig,
     TrainingConfig,
 )
@@ -95,7 +96,17 @@ def parse_args() -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "--use-small-model", action="store_true", help="Use small config for testing"
+        "--use-small-model",
+        action="store_true",
+        help="Use small config for testing (0.09B)",
+    )
+    parser.add_argument(
+        "--use-3b-model", action="store_true", help="Use 3B config (3.38B)"
+    )
+    parser.add_argument(
+        "--no-shard",
+        action="store_true",
+        help="Disable parameter sharding (for single-device training)",
     )
     parser.add_argument(
         "--resume-from", type=str, default=None, help="Resume from checkpoint path"
@@ -113,6 +124,8 @@ def parse_args() -> argparse.Namespace:
 def build_model_config(
     args: argparse.Namespace, vocab_size: int, max_seq_len: int
 ) -> ModelConfig:
+    if args.use_3b_model:
+        return replace(LARGE_3B_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
     if args.use_small_model:
         return ModelConfig(
             vocab_size=vocab_size,
@@ -128,7 +141,7 @@ def build_model_config(
             aggregation="nash",
             dtype="float32",
         )
-    return replace(LARGE_3B_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
+    return replace(MEDIUM_1_5B_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
 
 
 def build_training_config(args: argparse.Namespace) -> TrainingConfig:
@@ -172,8 +185,10 @@ def main() -> None:
     if hf_tokenizer.pad_token_id is None:
         hf_tokenizer.pad_token = hf_tokenizer.eos_token
 
-    num_scales = 3 if args.use_small_model else 4
-    compression_ratio = 2
+        num_scales = 3 if args.use_small_model else 4
+        if args.use_3b_model:
+            num_scales = 4
+        compression_ratio = 2
     raw_vocab = len(hf_tokenizer)
     aligned_vocab = round_vocab_size(raw_vocab)
     aligned_seq_len = round_seq_len(
@@ -190,123 +205,4 @@ def main() -> None:
     training_config = build_training_config(args)
 
     print(f"Model: {model_config}")
-    print(f"Training: {training_config}")
-
-    streaming_config = StreamingConfig(
-        path=args.dataset,
-        name=args.dataset_name,
-        split=args.split,
-        text_field="text",
-        num_workers=args.num_workers,
-        prefetch_buffer_size=args.worker_buffer_size,
-    )
-
-    loader = create_streaming_dataloader(
-        streaming_config,
-        LoaderConfig(
-            batch_size=training_config.batch_size,
-            shuffle_seed=training_config.seed,
-        ),
-        tokenizer,
-    )
-
-    requested_mesh = (args.mesh_data, args.mesh_fsdp, args.mesh_tp)
-    mesh = create_adaptive_mesh(requested_mesh, ("data", "fsdp", "tp"))
-    with mesh:
-        print(f"Mesh created: {mesh}")
-
-        print("Initializing model...")
-        model = MAHALanguageModel(model_config, key=model_key)
-        param_count = model.count_params()
-        print(f"Model parameters: {param_count:,} ({param_count / 1e9:.2f}B)")
-
-        state = init_train_state(model, training_config, pad_token_id=tokenizer.pad_id)
-
-        print("Sharding train state...")
-        state = shard_train_state(state, mesh)
-
-        ckpt_manager = OrbaxCheckpointManager(
-            args.checkpoint_dir,
-            max_to_keep=3,
-            enable_async=True,
-        )
-
-        if args.resume_from is not None:
-            print(f"Restoring from {args.resume_from}...")
-            state = ckpt_manager.restore(
-                state, step=None
-            )  # Will pick latest if step=None
-            print(f"Resumed at step {int(state.step)}")
-        elif args.checkpoint_dir and jax.process_index() == 0:
-            # Try to restore from default checkpoint dir if it exists
-            state = ckpt_manager.restore(state)
-            if int(state.step) > 0:
-                print(
-                    f"Auto-resumed from {args.checkpoint_dir} at step {int(state.step)}"
-                )
-
-        jit_train_step = jax.jit(train_step)
-        metrics = TrainMetrics.empty()
-
-        print("Starting training loop...")
-        step_start_time = time.perf_counter()
-
-        for batch in loader:
-            current_step = int(state.step)
-            if current_step >= training_config.total_steps:
-                break
-
-            # Shard input across data axis
-            batch = shard_input(batch, mesh)
-
-            # Execute step
-            state, loss_components = jit_train_step(state, batch)
-
-            # Metrics
-            batch_tokens = int(batch.token_ids.size)
-            # throughput is tokens/sec. We'll average this in clu_metrics
-            elapsed = time.perf_counter() - step_start_time
-            throughput = batch_tokens / max(elapsed, 1e-6)
-
-            # We need to get the learning rate from the optimizer schedule
-            # Since we don't have easy access to it here without recreating logic,
-            # we'll approximate or just use the base LR for now.
-            # Actually, the optimizer schedule is in state.optimizer.
-            # But let's just log the loss for now as primary.
-
-            metrics = metrics.merge(
-                TrainMetrics.single_from_model_output(
-                    loss=loss_components.total,
-                    learning_rate=training_config.learning_rate,  # Simplified
-                    throughput=throughput,
-                )
-            )
-
-            step_start_time = time.perf_counter()
-
-            # Logging
-            if (current_step + 1) % args.log_interval == 0:
-                if jax.process_index() == 0:
-                    computed = metrics.compute()
-                    print(
-                        f"Step {current_step + 1}: loss={float(computed['loss']):.4f}, tok/s={float(computed['throughput']):.0f}"
-                    )
-                metrics = TrainMetrics.empty()
-
-            # Checkpointing
-            if (current_step + 1) % args.checkpoint_interval == 0:
-                if jax.process_index() == 0:
-                    computed = metrics.compute()
-                    print(f"Saving checkpoint at step {current_step + 1}...")
-                    ckpt_manager.save(state, metrics={"loss": float(computed["loss"])})
-
-        print("Training finished.")
-        if jax.process_index() == 0:
-            final_metrics = metrics.compute()
-            ckpt_manager.save(state, metrics={"loss": float(final_metrics["loss"])})
-            ckpt_manager.wait_until_finished()
-            ckpt_manager.close()
-
-
-if __name__ == "__main__":
-    main()
+    if not (args.use_small_model or args.use_3b_model):\n        model_type = "1.5B (default)" if not (args.use_small_model or args.use_3b_model) else ("0.09B" if args.use_small_model else "3B" if args.use_3b_model\n    print("Model: " + model_type)\n    print("Model config: " + str(model_config))\n    print("Training: " + str(training_config))\n    print("Creating data loader...")\n    stream_config = StreamingConfig(\n        path=args.dataset,\n        name=args.dataset_name,\n        split=args.split,\n        text_field="text",\n        num_workers=args.num_workers,\n        prefetch_buffer_size=args.worker_buffer_size,\n    )\n    loader = create_streaming_dataloader(\n        stream_config,\n        LoaderConfig(\n            batch_size=training_config.batch_size,\n            shuffle_seed=training_config.seed,\n        ),\n        tokenizer,\n    )\n
