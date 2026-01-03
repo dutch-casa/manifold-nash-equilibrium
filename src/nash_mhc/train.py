@@ -1,8 +1,10 @@
 """Training entry point for Nash-MHC language model."""
 
 import argparse
+import csv
 import time
 from dataclasses import replace
+from pathlib import Path
 
 import jax
 import jax.numpy as jnp
@@ -249,6 +251,12 @@ def main() -> None:
     print(f"Effective batch size: {training_config.effective_batch_size}")
     print(f"Learning rate: {training_config.learning_rate}")
 
+    log_path = Path(args.checkpoint_dir) / "training_log.csv"
+    log_file = open(log_path, "w", newline="")
+    log_writer = csv.writer(log_file)
+    log_writer.writerow(["step", "loss", "lr", "throughput", "step_time"])
+    log_file.flush()
+
     step_times = []
     start_time = time.time()
 
@@ -282,6 +290,16 @@ def main() -> None:
                 f"throughput: {throughput:.1f} samples/s | "
                 f"step_time: {avg_step_time:.3f}s"
             )
+            log_writer.writerow(
+                [
+                    step_count,
+                    float(loss_components.total),
+                    float(current_lr),
+                    float(throughput),
+                    float(avg_step_time),
+                ]
+            )
+            log_file.flush()
 
         if step_count % args.checkpoint_interval == 0:
             print(f"Saving checkpoint at step {step_count}...")
@@ -298,6 +316,7 @@ def main() -> None:
     print(f"\nTraining complete in {total_time:.1f}s")
 
     checkpoint_manager.close()
+    log_file.close()
 
 
 if __name__ == "__main__":
