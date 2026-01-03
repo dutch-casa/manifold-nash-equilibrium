@@ -151,10 +151,10 @@ DEFAULT_MODEL_CONFIG = ModelConfig(
 
 SINGLE_TPU_CONFIG = ModelConfig(
     vocab_size=32768,
-    max_seq_len=1024,
-    d_model=512,
-    num_heads=8,
-    num_layers=8,
+    max_seq_len=2048,
+    d_model=768,
+    num_heads=12,
+    num_layers=12,
     num_scales=3,
     compression_ratio=2,
     ffn_multiplier=2.67,
@@ -165,8 +165,8 @@ SINGLE_TPU_CONFIG = ModelConfig(
 )
 
 SINGLE_TPU_TRAINING_CONFIG = TrainingConfig(
-    batch_size=4,
-    gradient_accumulation_steps=8,
+    batch_size=64,
+    gradient_accumulation_steps=1,
     learning_rate=3e-4,
     warmup_steps=1000,
     total_steps=50000,

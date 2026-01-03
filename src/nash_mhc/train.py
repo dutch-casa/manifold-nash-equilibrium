@@ -122,10 +122,16 @@ def round_seq_len(
 def main() -> None:
     args = parse_args()
 
-    jax.config.update("jax_default_device", jax.devices()[0])
+    device = jax.devices()[0]
+    jax.config.update("jax_default_device", device)
 
     print(f"JAX process {jax.process_index()} / {jax.process_count()} started.")
-    print(f"Devices: {jax.devices()}")
+    print(f"Device: {device}")
+
+    memory_stats = device.memory_stats()
+    gb_used = memory_stats.get("bytes_in_use", 0) / (1024**3)
+    gb_peak = memory_stats.get("peak_bytes_in_use", 0) / (1024**3)
+    print(f"TPU HBM: {gb_used:.2f} GB used / {gb_peak:.2f} GB peak")
 
     key = jax.random.PRNGKey(args.seed)
     key, model_key = jax.random.split(key)
@@ -149,7 +155,7 @@ def main() -> None:
     )
     tokenizer = TokenizerAdapter(hf_tokenizer, tokenizer_config)
 
-    model_config = build_model_config(args, aligned_vocab, aligned_seq_len)
+    model_config = build_model_config(args, aligned_vocab, max_seq_len=aligned_seq_len)
     training_config = build_training_config(args)
 
     print(f"Model config: {model_config}")
@@ -175,7 +181,15 @@ def main() -> None:
 
     print("Initializing model...")
     model = MAHALanguageModel(model_config, key=model_key)
-    print(f"Model parameters: {model.count_params():,}")
+    param_count = model.count_params()
+    print(f"Model parameters: {param_count:,}")
+    print(f"Model size (bfloat16): ~{param_count * 2 / (1024**3):.2f} GB")
+    print(
+        f"Batch size: {training_config.batch_size} | Sequence length: {model_config.max_seq_len}"
+    )
+    print(
+        f"Expected activation memory: ~{training_config.batch_size * model_config.max_seq_len * model_config.d_model * 4 / (1024**3):.2f} GB"
+    )
 
     print("Initializing train state...")
     state = init_train_state(
