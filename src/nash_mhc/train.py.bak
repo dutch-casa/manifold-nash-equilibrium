@@ -1,0 +1,281 @@
+"""Training entry point for Nash-MHC language model."""
+
+from __future__ import annotations
+
+import argparse
+import time
+from dataclasses import replace
+from typing import Iterator
+
+import jax
+import jax.numpy as jnp
+from transformers import AutoTokenizer
+
+from nash_mhc.data.datasets import DatasetConfig
+from nash_mhc.data.loader import (
+    LoaderConfig,
+    SequenceBatch,
+    build_sequence_dataset,
+    create_grain_dataset,
+    iterate_batches,
+)
+from nash_mhc.data.tokenizer import TokenizerAdapter, TokenizerConfig
+from nash_mhc.models.backbone import MAHALanguageModel
+from nash_mhc.sharding.mesh import MeshConfig, mesh_context
+from nash_mhc.training.loop import TrainState, init_train_state, train_step
+from nash_mhc.types.configs import (
+    LARGE_3B_CONFIG,
+    LARGE_3B_TRAINING_CONFIG,
+    ModelConfig,
+    TrainingConfig,
+)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Train Nash-MHC language model")
+
+    parser.add_argument(
+        "--dataset", type=str, default="wikitext", help="HuggingFace dataset path"
+    )
+    parser.add_argument(
+        "--dataset-name",
+        type=str,
+        default="wikitext-103-raw-v1",
+        help="Dataset config name",
+    )
+    parser.add_argument("--split", type=str, default="train", help="Dataset split")
+    parser.add_argument(
+        "--tokenizer", type=str, default="gpt2", help="HuggingFace tokenizer name"
+    )
+    parser.add_argument(
+        "--max-sequences", type=int, default=None, help="Cap on sequences to load"
+    )
+
+    parser.add_argument(
+        "--batch-size", type=int, default=None, help="Override batch size"
+    )
+    parser.add_argument(
+        "--learning-rate", type=float, default=None, help="Override learning rate"
+    )
+    parser.add_argument(
+        "--total-steps", type=int, default=None, help="Override total training steps"
+    )
+    parser.add_argument(
+        "--warmup-steps", type=int, default=None, help="Override warmup steps"
+    )
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
+
+    parser.add_argument(
+        "--mesh-data", type=int, default=1, help="Data parallelism axis size"
+    )
+    parser.add_argument("--mesh-fsdp", type=int, default=1, help="FSDP axis size")
+    parser.add_argument(
+        "--mesh-tp", type=int, default=1, help="Tensor parallelism axis size"
+    )
+
+    parser.add_argument(
+        "--log-interval", type=int, default=10, help="Steps between log prints"
+    )
+    parser.add_argument(
+        "--use-small-model", action="store_true", help="Use small config for testing"
+    )
+
+    return parser.parse_args()
+
+
+def build_model_config(
+    args: argparse.Namespace, vocab_size: int, max_seq_len: int
+) -> ModelConfig:
+    if args.use_small_model:
+        return ModelConfig(
+            vocab_size=vocab_size,
+            max_seq_len=max_seq_len,
+            d_model=512,
+            num_heads=8,
+            num_layers=6,
+            num_scales=3,
+            compression_ratio=2,
+            ffn_multiplier=2.67,
+            sinkhorn_iterations=10,
+            nash_iterations=3,
+            aggregation="nash",
+            dtype="float32",
+        )
+    return replace(LARGE_3B_CONFIG, vocab_size=vocab_size, max_seq_len=max_seq_len)
+
+
+def build_training_config(args: argparse.Namespace) -> TrainingConfig:
+    base = LARGE_3B_TRAINING_CONFIG
+    overrides = {}
+    if args.batch_size is not None:
+        overrides["batch_size"] = args.batch_size
+    if args.learning_rate is not None:
+        overrides["learning_rate"] = args.learning_rate
+    if args.total_steps is not None:
+        overrides["total_steps"] = args.total_steps
+    if args.warmup_steps is not None:
+        overrides["warmup_steps"] = args.warmup_steps
+    overrides["seed"] = args.seed
+    return replace(base, **overrides) if overrides else base
+
+
+def build_mesh_config(args: argparse.Namespace) -> MeshConfig:
+    return MeshConfig(
+        axis_lengths=(args.mesh_data, args.mesh_fsdp, args.mesh_tp),
+        axis_names=("data", "fsdp", "tp"),
+    )
+
+
+def round_vocab_size(size: int, alignment: int = 128) -> int:
+    return ((size + alignment - 1) // alignment) * alignment
+
+
+def round_seq_len(
+    length: int, num_scales: int, compression_ratio: int, alignment: int = 128
+) -> int:
+    scale_factor = compression_ratio ** (num_scales - 1)
+    lcm = alignment * scale_factor
+    return ((length + lcm - 1) // lcm) * lcm
+
+
+def log_step(step: int, loss: float, tokens_per_sec: float, elapsed: float) -> None:
+    print(
+        f"step={step:>6} | loss={loss:.4f} | tok/s={tokens_per_sec:.0f} | elapsed={elapsed:.1f}s"
+    )
+
+
+def train_loop(
+    state: TrainState,
+    batches: Iterator[SequenceBatch],
+    total_steps: int,
+    log_interval: int,
+) -> TrainState:
+    jit_train_step = jax.jit(train_step)
+
+    tokens_since_log = 0
+    loss_accum = 0.0
+    steps_since_log = 0
+    log_start = time.perf_counter()
+
+    for batch in batches:
+        if state.step >= total_steps:
+            break
+
+        state, loss_components = jit_train_step(state, batch)
+
+        batch_tokens = int(batch.token_ids.size)
+        tokens_since_log += batch_tokens
+        loss_accum += float(loss_components.total)
+        steps_since_log += 1
+
+        if state.step % log_interval == 0:
+            elapsed = time.perf_counter() - log_start
+            avg_loss = loss_accum / max(steps_since_log, 1)
+            tok_per_sec = tokens_since_log / max(elapsed, 1e-6)
+            log_step(state.step, avg_loss, tok_per_sec, elapsed)
+
+            tokens_since_log = 0
+            loss_accum = 0.0
+            steps_since_log = 0
+            log_start = time.perf_counter()
+
+    return state
+
+
+def main() -> None:
+    args = parse_args()
+
+    print(f"JAX devices: {jax.devices()}")
+    print(f"JAX device count: {jax.device_count()}")
+
+    key = jax.random.PRNGKey(args.seed)
+    key, model_key = jax.random.split(key)
+
+    print(f"Loading tokenizer: {args.tokenizer}")
+    hf_tokenizer = AutoTokenizer.from_pretrained(args.tokenizer)
+    if hf_tokenizer.pad_token_id is None:
+        hf_tokenizer.pad_token = hf_tokenizer.eos_token
+
+    num_scales = 3 if args.use_small_model else 4
+    compression_ratio = 2
+    raw_vocab = len(hf_tokenizer)
+    aligned_vocab = round_vocab_size(raw_vocab)
+    aligned_seq_len = round_seq_len(
+        hf_tokenizer.model_max_length, num_scales, compression_ratio
+    )
+    aligned_seq_len = min(aligned_seq_len, 4096)
+
+    tokenizer_config = TokenizerConfig(
+        max_length=aligned_seq_len, pad_id=hf_tokenizer.pad_token_id
+    )
+    tokenizer = TokenizerAdapter(hf_tokenizer, tokenizer_config)
+
+    model_config = build_model_config(args, aligned_vocab, aligned_seq_len)
+    training_config = build_training_config(args)
+    mesh_config = build_mesh_config(args)
+
+    print(
+        f"Model config: d_model={model_config.d_model}, layers={model_config.num_layers}, heads={model_config.num_heads}"
+    )
+    print(f"Vocab: {model_config.vocab_size}, Seq len: {model_config.max_seq_len}")
+    print(
+        f"Training: batch={training_config.batch_size}, lr={training_config.learning_rate}, steps={training_config.total_steps}"
+    )
+
+    dataset_config = DatasetConfig(
+        path=args.dataset,
+        name=args.dataset_name,
+        split=args.split,
+        text_field="text",
+    )
+
+    print(f"Loading dataset: {args.dataset}/{args.dataset_name}")
+    sequences = build_sequence_dataset(
+        dataset_config, tokenizer, max_sequences=args.max_sequences
+    )
+    print(f"Loaded {len(sequences)} sequences")
+
+    if len(sequences) == 0:
+        raise ValueError("No sequences loaded from dataset")
+
+    loader_config = LoaderConfig(
+        batch_size=training_config.batch_size,
+        shuffle_seed=training_config.seed,
+        num_epochs=1000,
+        drop_remainder=True,
+    )
+    grain_dataset = create_grain_dataset(sequences, config=loader_config)
+
+    with mesh_context(mesh_config) as mesh:
+        print(f"Mesh: {mesh.shape}")
+
+        print("Initializing model...")
+        model = MAHALanguageModel(model_config, key=model_key)
+        param_count = model.count_params()
+        print(f"Model parameters: {param_count:,} ({param_count / 1e9:.2f}B)")
+
+        state = init_train_state(model, training_config, pad_token_id=tokenizer.pad_id)
+
+        print("Starting training...")
+        start_time = time.perf_counter()
+
+        state = train_loop(
+            state,
+            iterate_batches(grain_dataset),
+            training_config.total_steps,
+            args.log_interval,
+        )
+
+        total_time = time.perf_counter() - start_time
+        print(
+            f"Training complete. Total time: {total_time:.1f}s, Final step: {state.step}"
+        )
+
+        # TODO: Implement checkpointing
+        # - Save model parameters with orbax or flax.serialization
+        # - Save optimizer state for resumption
+        # - Save training config and step for reproducibility
+
+
+if __name__ == "__main__":
+    main()

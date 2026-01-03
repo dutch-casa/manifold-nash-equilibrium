@@ -5,50 +5,30 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Protocol, Sequence
 
+import jax
 import numpy as np
-import numpy.typing as npt
-
-
-class TokenizerLike(Protocol):
-    """Minimal HF tokenizer protocol."""
-
-    def __call__(
-        self,
-        text: str | Sequence[str],
-        *,
-        max_length: int,
-        padding: str,
-        truncation: bool,
-        return_attention_mask: bool,
-        return_tensors: str | None = None,
-    ) -> Any: ...
-
-    @property
-    def pad_token_id(self) -> int | None: ...
-
-    @property
-    def eos_token_id(self) -> int | None: ...
 
 
 @dataclass(frozen=True, slots=True)
 class TokenizerConfig:
-    """Tokenizer hyperparameters aligned with `ModelConfig`."""
-
+    """Configuration for tokenizer behavior."""
     max_length: int
     pad_id: int | None = None
     eos_id: int | None = None
-
-    def __post_init__(self) -> None:
-        if self.max_length <= 0:
-            raise ValueError(f"max_length must be positive, got {self.max_length}")
 
 
 @dataclass(frozen=True, slots=True)
 class TokenizerOutput:
     """Canonical tokenized sequence representation using numpy arrays for data loading boundary."""
+    input_ids: jax.Array
+    attention_mask: jax.Array
 
-    input_ids: npt.NDArray[np.int32]
-    attention_mask: npt.NDArray[np.int32]
+
+class TokenizerLike(Protocol):
+    """Protocol for tokenizer-like objects (e.g. Hugging Face)."""
+    def __call__(self, text: str | list[str], **kwargs: Any) -> dict[str, Any]: ...
+    pad_token_id: int | None
+    eos_token_id: int | None
 
 
 class TokenizerAdapter:
@@ -95,7 +75,10 @@ class TokenizerAdapter:
             raise ValueError(
                 f"Tokenized length {input_ids.shape[0]} must equal max_length {self._config.max_length}"
             )
-        return TokenizerOutput(input_ids=input_ids, attention_mask=attn)
+        return TokenizerOutput(
+            input_ids=jax.numpy.asarray(input_ids),
+            attention_mask=jax.numpy.asarray(attn)
+        )
 
     def batch_encode(self, texts: Sequence[str]) -> list[TokenizerOutput]:
         """Tokenize multiple strings."""
@@ -112,8 +95,8 @@ class TokenizerAdapter:
         for i in range(ids.shape[0]):
             outputs.append(
                 TokenizerOutput(
-                    input_ids=ids[i],
-                    attention_mask=attn[i],
+                    input_ids=jax.numpy.asarray(ids[i]),
+                    attention_mask=jax.numpy.asarray(attn[i]),
                 )
             )
         return outputs

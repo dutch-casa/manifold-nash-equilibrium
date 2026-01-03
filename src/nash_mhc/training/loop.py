@@ -41,10 +41,16 @@ def create_optimizer(config: TrainingConfig) -> optax.GradientTransformation:
         schedules=[warmup, decay],
         boundaries=[config.warmup_steps],
     )
-    return optax.adamw(
-        learning_rate=lr_schedule,
-        weight_decay=config.weight_decay,
-    )
+    
+    # Gradient clipping
+    chain = [
+        optax.clip_by_global_norm(config.max_grad_norm),
+        optax.adamw(
+            learning_rate=lr_schedule,
+            weight_decay=config.weight_decay,
+        )
+    ]
+    return optax.chain(*chain)
 
 
 def init_train_state(
@@ -66,6 +72,9 @@ def init_train_state(
 
 
 def _prepare_inputs(batch: SequenceBatch) -> tuple:
+    # input: [B, N]
+    # inputs: tokens 0 to N-2
+    # labels: tokens 1 to N-1
     inputs = batch.token_ids[:, :-1]
     labels = batch.token_ids[:, 1:]
     return inputs, labels
@@ -79,7 +88,8 @@ def train_step(state: TrainState, batch: SequenceBatch) -> tuple[TrainState, Los
     def loss_fn(filtered_params):
         model = eqx.combine(filtered_params, static)
         logits, aux_loss = model(inputs, causal=True)
-        logits = logits[:, :-1, :]
+        # logits shape: [B, N-1, V]
+        # labels shape: [B, N-1]
         components = cross_entropy_loss(
             logits,
             labels,
@@ -94,31 +104,3 @@ def train_step(state: TrainState, batch: SequenceBatch) -> tuple[TrainState, Los
     new_model = eqx.combine(new_params, static)
     new_state = replace(state, model=new_model, opt_state=new_opt_state, step=state.step + 1)
     return new_state, components
-
-
-def train_epoch(
-    state: TrainState,
-    batches: Iterable[SequenceBatch],
-    *,
-    max_steps: int | None = None,
-) -> tuple[TrainState, MetricState]:
-    """Iterate over an epoch of data."""
-    total_loss = 0.0
-    total_tokens = 0
-    start = time.time()
-    for idx, batch in enumerate(batches):
-        if max_steps is not None and idx >= max_steps:
-            break
-        state, metrics = train_step(state, batch)
-        total_loss += float(metrics.total)
-        total_tokens += int(batch.token_ids.size)
-    elapsed = time.time() - start
-    average_loss = total_loss / max(idx + 1, 1)
-    summary = aggregate_metrics(
-        total_loss=average_loss,
-        total_tokens=total_tokens,
-        elapsed_time_s=elapsed,
-        step=state.step,
-    )
-    return state, summary
-

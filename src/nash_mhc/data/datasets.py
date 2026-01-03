@@ -8,7 +8,7 @@ from typing import Iterator, Sequence
 import numpy as np
 from datasets import Dataset, IterableDataset, load_dataset
 
-from nash_mhc.data.tokenizer import TokenizerAdapter, TokenizerOutput
+from .tokenizer import TokenizerAdapter, TokenizerOutput
 
 
 @dataclass(frozen=True, slots=True)

@@ -11,12 +11,12 @@ import numpy as np
 from jaxtyping import Int, Array
 
 
-from nash_mhc.data.datasets import (
+from .datasets import (
     DatasetConfig,
     load_text_dataset,
     materialize_sequences,
 )
-from nash_mhc.data.tokenizer import TokenizerAdapter
+from .tokenizer import TokenizerAdapter
 
 
 class _SequenceMapDataset(grain.MapDataset[dict[str, np.ndarray]]):
