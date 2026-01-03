@@ -8,6 +8,7 @@ from typing import Iterator, Sequence
 import grain
 import jax.numpy as jnp
 import numpy as np
+from flax import struct
 from jaxtyping import Int, Array
 
 from .datasets import (
@@ -32,7 +33,7 @@ class _SequenceMapDataset(grain.MapDataset[dict[str, np.ndarray]]):
         return None
 
 
-@dataclass(frozen=True, slots=True)
+@struct.dataclass
 class SequenceBatch:
     token_ids: Int[Array, "B N"]
     attention_mask: Int[Array, "B N"]
