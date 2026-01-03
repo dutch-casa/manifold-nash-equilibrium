@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/types/configs.py
+# hypothesis_version: 6.148.9
+
+[0.0003, 0.01, 0.1, 1.0, 2.67, 128, 768, 1000, 2048, 32768, 50000, 'bfloat16', 'convex', 'float32', 'nash']

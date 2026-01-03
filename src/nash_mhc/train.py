@@ -1,7 +1,5 @@
 """Training entry point for Nash-MHC language model."""
 
-from __future__ import annotations
-
 import argparse
 import time
 from dataclasses import replace
@@ -10,8 +8,6 @@ from typing import Iterator
 import jax
 import jax.numpy as jnp
 from transformers import AutoTokenizer
-from flax import struct
-from clu import metrics as clu_metrics
 
 from nash_mhc.data.loader import LoaderConfig
 from nash_mhc.data.streaming import StreamingConfig, create_streaming_dataloader
@@ -25,13 +21,6 @@ from nash_mhc.types.configs import (
     ModelConfig,
     TrainingConfig,
 )
-
-
-@struct.dataclass
-class TrainMetrics(clu_metrics.Collection):
-    loss: clu_metrics.Average
-    learning_rate: clu_metrics.LastValue
-    throughput: clu_metrics.Average
 
 
 def parse_args() -> argparse.Namespace:
@@ -207,7 +196,6 @@ def main() -> None:
     print(f"Effective batch size: {training_config.effective_batch_size}")
     print(f"Learning rate: {training_config.learning_rate}")
 
-    metrics = TrainMetrics.empty()
     step_times = []
     start_time = time.time()
 
@@ -233,20 +221,12 @@ def main() -> None:
                 progress = (step_count - training_config.warmup_steps) / decay_steps
                 current_lr = current_lr * 0.5 * (1 + jnp.cos(jnp.pi * progress))
 
-        metrics = metrics.merge(
-            TrainMetrics.single_from_model_output(
-                loss=float(loss_components.total),
-                learning_rate=current_lr,
-                throughput=throughput,
-            )
-        )
-
         if step_count % args.log_interval == 0:
             print(
                 f"Step {step_count}/{training_config.total_steps} | "
-                f"loss: {metrics.loss.compute():.4f} | "
-                f"lr: {metrics.learning_rate.compute():.2e} | "
-                f"throughput: {metrics.throughput.compute():.1f} samples/s | "
+                f"loss: {float(loss_components.total):.4f} | "
+                f"lr: {float(current_lr):.2e} | "
+                f"throughput: {throughput:.1f} samples/s | "
                 f"step_time: {avg_step_time:.3f}s"
             )
 
@@ -255,25 +235,15 @@ def main() -> None:
             checkpoint_manager.save(
                 state,
                 metrics={
-                    "loss": float(metrics.loss.compute()),
-                    "learning_rate": float(metrics.learning_rate.compute()),
-                    "throughput": float(metrics.throughput.compute()),
+                    "loss": float(loss_components.total),
+                    "learning_rate": float(current_lr),
+                    "throughput": float(throughput),
                 },
             )
 
     total_time = time.time() - start_time
     print(f"\nTraining complete in {total_time:.1f}s")
-    print(f"Final metrics: {metrics.compute()}")
 
-    checkpoint_manager.save(
-        state,
-        metrics={
-            "loss": float(metrics.loss.compute()),
-            "learning_rate": float(metrics.learning_rate.compute()),
-            "throughput": float(metrics.throughput.compute()),
-        },
-    )
-    checkpoint_manager.wait_until_finished()
     checkpoint_manager.close()
 
 
