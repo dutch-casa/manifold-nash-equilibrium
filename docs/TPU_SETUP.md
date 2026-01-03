@@ -66,6 +66,8 @@ python -m nash_mhc.train \
 - `--mesh-tp 2`: Tensor parallelism (attention head sharding)
 - **Total**: 2 × 2 × 2 = 8 devices (full v6e-1)
 
+**Note**: The training script automatically validates mesh configuration against available devices. For single-device testing (e.g., GPU), use `--mesh-data 1 --mesh-fsdp 1 --mesh-tp 1` or omit the flags (defaults to 1×1×1).
+
 ## GCP Cloud TPU Setup
 
 ### 1. Create TPU VM
@@ -110,7 +112,7 @@ pip install -e ".[tpu,dev]"
 ### 4. Run Training
 
 ```bash
-# Single-device (debugging)
+# Single-device (debugging) - mesh auto-configured to 1×1×1
 python -m nash_mhc.train \
   --use-small-model \
   --total-steps 100 \

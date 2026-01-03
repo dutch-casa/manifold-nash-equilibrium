@@ -18,7 +18,7 @@ from nash_mhc.data.loader import LoaderConfig
 from nash_mhc.data.streaming import StreamingConfig, create_streaming_dataloader
 from nash_mhc.data.tokenizer import TokenizerAdapter, TokenizerConfig
 from nash_mhc.models.backbone import MAHALanguageModel
-from nash_mhc.sharding.mesh import MeshConfig, mesh_context
+from nash_mhc.sharding.mesh import create_adaptive_mesh, mesh_context
 from nash_mhc.sharding.shard import shard_train_state, shard_input
 from nash_mhc.training.loop import init_train_state, train_step
 from nash_mhc.training.checkpoint import OrbaxCheckpointManager
@@ -152,13 +152,6 @@ def build_training_config(args: argparse.Namespace) -> TrainingConfig:
     return replace(base, **overrides) if overrides else base
 
 
-def build_mesh_config(args: argparse.Namespace) -> MeshConfig:
-    return MeshConfig(
-        axis_lengths=(args.mesh_data, args.mesh_fsdp, args.mesh_tp),
-        axis_names=("data", "fsdp", "tp"),
-    )
-
-
 def round_vocab_size(size: int, alignment: int = 128) -> int:
     return ((size + alignment - 1) // alignment) * alignment
 
@@ -209,7 +202,6 @@ def main() -> None:
 
     model_config = build_model_config(args, aligned_vocab, aligned_seq_len)
     training_config = build_training_config(args)
-    mesh_config = build_mesh_config(args)
 
     print(f"Model: {model_config}")
     print(f"Training: {training_config}")
@@ -232,7 +224,9 @@ def main() -> None:
         tokenizer,
     )
 
-    with mesh_context(mesh_config) as mesh:
+    requested_mesh = (args.mesh_data, args.mesh_fsdp, args.mesh_tp)
+    mesh = create_adaptive_mesh(requested_mesh, ("data", "fsdp", "tp"))
+    with mesh:
         print(f"Mesh created: {mesh}")
 
         print("Initializing model...")

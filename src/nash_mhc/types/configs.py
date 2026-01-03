@@ -164,6 +164,21 @@ SMALL_MODEL_CONFIG = ModelConfig(
     dtype="float32",
 )
 
+MEDIUM_1_5B_CONFIG = ModelConfig(
+    vocab_size=65536,
+    max_seq_len=4096,
+    d_model=1600,
+    num_heads=16,
+    num_layers=14,
+    num_scales=4,
+    compression_ratio=2,
+    ffn_multiplier=2.67,
+    sinkhorn_iterations=10,
+    nash_iterations=3,
+    aggregation="nash",
+    dtype="bfloat16",
+)
+
 LARGE_3B_CONFIG = ModelConfig(
     vocab_size=65536,
     max_seq_len=4096,
@@ -180,6 +195,18 @@ LARGE_3B_CONFIG = ModelConfig(
 )
 
 LARGE_3B_TRAINING_CONFIG = TrainingConfig(
+    batch_size=32,
+    gradient_accumulation_steps=8,
+    learning_rate=3e-4,
+    warmup_steps=2000,
+    total_steps=100000,
+    weight_decay=0.1,
+    max_grad_norm=1.0,
+    lambda_sparsity=0.01,
+    seed=42,
+)
+
+MEDIUM_1_5B_TRAINING_CONFIG = TrainingConfig(
     batch_size=32,
     gradient_accumulation_steps=8,
     learning_rate=3e-4,
