@@ -25,7 +25,7 @@ pip install -U "jax[tpu]" -f https://storage.googleapis.com/jax-releases/libtpu_
 pip install -U jaxlib
 
 # Nash-MHC dependencies
-pip install equinox optax orbax-checkpoint clu wandb
+pip install equinox optax orbax-checkpoint clu
 pip install jaxtyping beartype
 pip install datasets grain-nightly transformers
 ```
@@ -53,12 +53,11 @@ Use 3D mesh sharding for optimal throughput:
 python -m nash_mhc.train \
   --dataset HuggingFaceTB/smollm-corpus \
   --dataset-name cosmopedia-v2 \
-  --tokenizer HuggingFaceTB/smollm-360M \
-  --batch-size 32 \
-  --mesh-data 2 --mesh-fsdp 2 --mesh-tp 2 \
-  --checkpoint-dir ./checkpoints \
-  --wandb-project nash-mhc-3b
-```
+   --tokenizer HuggingFaceTB/smollm-360M \
+   --batch-size 32 \
+   --mesh-data 2 --mesh-fsdp 2 --mesh-tp 2 \
+   --checkpoint-dir ./checkpoints
+   ```
 
 **Mesh Configuration**:
 - `--mesh-data 2`: Data parallelism (batch dimension)
@@ -125,9 +124,8 @@ python -m nash_mhc.train \
   --tokenizer HuggingFaceTB/smollm-360M \
   --batch-size 32 \
   --mesh-data 2 --mesh-fsdp 2 --mesh-tp 2 \
-  --total-steps 100000 \
-  --wandb-project nash-mhc-3b
-```
+  --total-steps 100000
+  ```
 
 ## Performance Tuning
 
@@ -165,12 +163,15 @@ Reduce checkpoint frequency for faster training:
 ```
 
 ## Monitoring
+Metrics are tracked via **CLU**:
+- **Loss**: Training loss and components (total, sparsity).
+- **Throughput**: Tokens per second.
+- **Checkpoints**: Saved via Orbax with async support.
 
-### Weights & Biases
-Configure in training script:
+### TensorBoard
 ```bash
---wandb-project nash-mhc-3b \
---wandb-entity your-username
+# On local machine after SSH into TPU
+tensorboard --logdir ./checkpoints
 ```
 
 ### TensorBoard

@@ -9,7 +9,7 @@ Ensure JAX with TPU support and all dependencies are installed:
 ```bash
 pip install -U "jax[tpu]" -f https://storage.googleapis.com/jax-releases/libtpu_releases.html
 pip install equinox flax optax lineax jaxtyping beartype
-pip install orbax-checkpoint clu wandb datasets grain-nightly transformers
+pip install orbax-checkpoint clu datasets grain-nightly transformers
 ```
 
 ### 2. Google Colab Setup
@@ -81,7 +81,7 @@ python -m nash_mhc.train \
 | `--num-workers` | Data loading workers | 8 |
 
 ## Monitoring
-Metrics are logged via **W&B** and **CLU**.
+Metrics are tracked via **CLU**:
 - **Loss**: Training loss and components (total, sparsity).
 - **Throughput**: Tokens per second.
 - **Checkpoints**: Saved via Orbax with async support.

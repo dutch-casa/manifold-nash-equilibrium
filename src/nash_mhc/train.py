@@ -12,7 +12,6 @@ import jax.numpy as jnp
 from transformers import AutoTokenizer
 from flax import struct
 from clu import metrics as clu_metrics
-import wandb
 
 from nash_mhc.data.loader import LoaderConfig
 from nash_mhc.data.streaming import StreamingConfig, create_streaming_dataloader
@@ -94,12 +93,7 @@ def parse_args() -> argparse.Namespace:
         default="./checkpoints",
         help="Checkpoint directory",
     )
-    parser.add_argument(
-        "--wandb-project", type=str, default="nash-mhc", help="W&B project name"
-    )
-    parser.add_argument(
-        "--wandb-entity", type=str, default=None, help="W&B entity (username/team)"
-    )
+
     parser.add_argument(
         "--use-small-model", action="store_true", help="Use small config for testing"
     )
@@ -166,14 +160,6 @@ def round_seq_len(
 
 def main() -> None:
     args = parse_args()
-
-    if jax.process_index() == 0:
-        wandb.init(
-            project=args.wandb_project,
-            entity=args.wandb_entity,
-            config=vars(args),
-            name=f"nash-mhc-{args.seed}",
-        )
 
     print(f"JAX process {jax.process_index()} / {jax.process_count()} started.")
     print(f"Devices: {jax.devices()}")
@@ -302,14 +288,6 @@ def main() -> None:
             if (current_step + 1) % args.log_interval == 0:
                 if jax.process_index() == 0:
                     computed = metrics.compute()
-                    wandb.log(
-                        {
-                            "train/loss": float(computed["loss"]),
-                            "train/throughput_tok_s": float(computed["throughput"]),
-                            "train/step": current_step + 1,
-                        },
-                        step=current_step + 1,
-                    )
                     print(
                         f"Step {current_step + 1}: loss={float(computed['loss']):.4f}, tok/s={float(computed['throughput']):.0f}"
                     )
@@ -328,7 +306,6 @@ def main() -> None:
             ckpt_manager.save(state, metrics={"loss": float(final_metrics["loss"])})
             ckpt_manager.wait_until_finished()
             ckpt_manager.close()
-            wandb.finish()
 
 
 if __name__ == "__main__":
