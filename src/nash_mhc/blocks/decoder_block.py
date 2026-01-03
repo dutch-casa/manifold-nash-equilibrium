@@ -10,7 +10,6 @@ Reference: Papers 2512.14925v2 (MAHA) and 2512.24880v1 (mHC)
 from typing import Literal
 
 import jax
-import jax.numpy as jnp
 import equinox as eqx
 from jaxtyping import Float, Array, PRNGKeyArray
 

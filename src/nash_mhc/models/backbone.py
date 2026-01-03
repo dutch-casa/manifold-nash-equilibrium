@@ -5,8 +5,6 @@ Full transformer architecture with hierarchical multiscale attention
 and manifold-constrained residual connections.
 """
 
-from typing import Literal
-
 import jax
 import jax.numpy as jnp
 import equinox as eqx
@@ -171,7 +169,9 @@ class MAHALanguageModel(eqx.Module):
                 # Create mask for non-top-k values
                 mask = jnp.ones_like(next_logits) * (-1e9)
                 # Scatter top-k values back
-                next_logits = mask.at[jnp.arange(B)[:, None], top_indices].set(top_values)
+                next_logits = mask.at[jnp.arange(B)[:, None], top_indices].set(
+                    top_values
+                )
 
             # Sample
             key, subkey = jax.random.split(key)

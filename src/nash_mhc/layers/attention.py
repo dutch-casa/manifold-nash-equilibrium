@@ -11,7 +11,6 @@ import jax
 import jax.numpy as jnp
 import equinox as eqx
 from jaxtyping import Float, Array
-from typing import Callable
 
 from nash_mhc.primitives.rope import apply_rope_per_scale, compute_rope_freqs
 from nash_mhc.layers.decomposition import HierarchicalDecomposition

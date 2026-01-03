@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterator, Sequence
+from typing import Iterator
 
 import numpy as np
 from datasets import Dataset, IterableDataset, load_dataset
@@ -55,7 +55,9 @@ def materialize_sequences(
 ) -> list[dict[str, np.ndarray]]:
     """Tokenize dataset rows eagerly to feed Grain MapDatasets."""
     sequences: list[dict[str, np.ndarray]] = []
-    for idx, item in enumerate(iter_tokenized_sequences(dataset, tokenizer, text_field=text_field)):
+    for idx, item in enumerate(
+        iter_tokenized_sequences(dataset, tokenizer, text_field=text_field)
+    ):
         sequences.append(
             {
                 "input_ids": np.asarray(item.input_ids, dtype=np.int32),
@@ -65,4 +67,3 @@ def materialize_sequences(
         if max_sequences is not None and idx + 1 >= max_sequences:
             break
     return sequences
-

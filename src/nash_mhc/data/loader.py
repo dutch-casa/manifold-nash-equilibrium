@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, Iterator, Sequence
+from typing import Iterator, Sequence
 
 import grain
 import jax.numpy as jnp

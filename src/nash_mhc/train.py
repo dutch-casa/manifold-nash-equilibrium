@@ -3,7 +3,6 @@
 import argparse
 import time
 from dataclasses import replace
-from typing import Iterator
 
 import jax
 import jax.numpy as jnp

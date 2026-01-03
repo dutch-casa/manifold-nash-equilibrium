@@ -47,7 +47,7 @@ class RMSNorm(eqx.Module):
             Normalized tensor [..., D].
         """
         # Compute RMS
-        rms = jnp.sqrt(jnp.mean(x ** 2, axis=-1, keepdims=True) + self.eps)
+        rms = jnp.sqrt(jnp.mean(x**2, axis=-1, keepdims=True) + self.eps)
 
         # Normalize and scale
         return (x / rms) * self.weight

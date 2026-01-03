@@ -12,6 +12,7 @@ import numpy as np
 @dataclass(frozen=True, slots=True)
 class TokenizerConfig:
     """Configuration for tokenizer behavior."""
+
     max_length: int
     pad_id: int | None = None
     eos_id: int | None = None
@@ -20,13 +21,16 @@ class TokenizerConfig:
 @dataclass(frozen=True, slots=True)
 class TokenizerOutput:
     """Canonical tokenized sequence representation using numpy arrays for data loading boundary."""
+
     input_ids: jax.Array
     attention_mask: jax.Array
 
 
 class TokenizerLike(Protocol):
     """Protocol for tokenizer-like objects (e.g. Hugging Face)."""
+
     def __call__(self, text: str | list[str], **kwargs: Any) -> dict[str, Any]: ...
+
     pad_token_id: int | None
     eos_token_id: int | None
 
@@ -77,7 +81,7 @@ class TokenizerAdapter:
             )
         return TokenizerOutput(
             input_ids=jax.numpy.asarray(input_ids),
-            attention_mask=jax.numpy.asarray(attn)
+            attention_mask=jax.numpy.asarray(attn),
         )
 
     def batch_encode(self, texts: Sequence[str]) -> list[TokenizerOutput]:

@@ -36,4 +36,3 @@ def aggregate_metrics(
         tokens_per_second=token_rate,
         perplexity=ppl,
     )
-
