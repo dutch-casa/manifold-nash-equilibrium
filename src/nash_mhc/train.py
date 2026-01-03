@@ -203,7 +203,7 @@ def main() -> None:
         state = checkpoint_manager.restore(state)
 
     print("Compiling train step...")
-    train_step_jit = jax.jit(train_step)
+    train_step_jit = jax.jit(train_step, static_argnames=("optimizer",))
 
     print("Starting training...")
     print(f"Total steps: {training_config.total_steps}")

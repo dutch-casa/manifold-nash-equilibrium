@@ -13,5 +13,6 @@ def key():
 @pytest.fixture
 def small_config():
     """Provide a small model config for testing."""
-    from nash_mhc.types.configs import SMALL_MODEL_CONFIG
-    return SMALL_MODEL_CONFIG
+    from nash_mhc.types.configs import SINGLE_TPU_CONFIG
+
+    return SINGLE_TPU_CONFIG
