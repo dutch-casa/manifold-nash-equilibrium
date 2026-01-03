@@ -80,9 +80,10 @@ def sinkhorn_knopp(
         length=num_iterations,
     )
 
-    # Compute final doubly stochastic matrix
     log_P = log_alpha_f32 + u_final[..., :, None] + v_final[..., None, :]
+    log_P = jnp.clip(log_P, -20.0, 20.0)
     P = jnp.exp(log_P)
+    P = jnp.clip(P, 1e-8, 1.0)
 
     return P.astype(original_dtype)
 

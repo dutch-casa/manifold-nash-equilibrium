@@ -7,11 +7,12 @@ Nash equilibrium or convex optimization strategies.
 Reference: Paper 2512.14925v2 (MAHA), Section 4.3
 """
 
+from typing import Literal, cast
+
 import jax
 import jax.numpy as jnp
 import equinox as eqx
 from jaxtyping import Float, Array
-from typing import Literal
 
 from nash_mhc.primitives.nash_solver import nash_best_response, compute_sparsity_loss
 from nash_mhc.primitives.upsample import nearest_upsample
@@ -93,17 +94,18 @@ class OptimizationAggregation(eqx.Module):
         stacked = jnp.stack(upsampled, axis=1)
 
         if self.strategy == "nash":
-            aggregated, weights = nash_best_response(stacked, self.nash_iterations)
-            aux_loss = jnp.array(0.0)  # No auxiliary loss for Nash
+            result = cast(
+                tuple[Float[Array, "B N D"], Float[Array, "B L"]],
+                nash_best_response(stacked, self.nash_iterations),
+            )
+            aggregated = result[0]
+            weights: Float[Array, "B L"] | Float[Array, "L"] = result[1]
+            aux_loss = jnp.array(0.0)
 
-        else:  # convex
-            # Enforce simplex constraint via softmax
-            weights = jax.nn.softmax(self.convex_logits)  # [L]
-
-            # Weighted aggregation: einsum for clarity
+        else:
+            assert self.convex_logits is not None
+            weights = jax.nn.softmax(self.convex_logits)
             aggregated = jnp.einsum("l,blnd->bnd", weights, stacked)
-
-            # L1 sparsity penalty
             aux_loss = compute_sparsity_loss(weights, self.lambda_sparsity)
 
         return aggregated, aux_loss

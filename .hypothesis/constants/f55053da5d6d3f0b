@@ -1,0 +1,4 @@
+# file: /Users/dutchcaz/Projects/nash.mhc/src/nash_mhc/primitives/nash_solver.py
+# hypothesis_version: 6.148.9
+
+[1e-08, 1.0, '... L', 'B L', 'B L N D', 'B N D', 'L', 'l,blnd->bnd', 'num_iterations']

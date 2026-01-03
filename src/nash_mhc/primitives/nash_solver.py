@@ -58,26 +58,17 @@ def nash_best_response(
         i: int,
         weights: Float[Array, "B L"],
     ) -> Float[Array, "B L"]:
-        # Expand weights for broadcasting: [B, L] -> [B, L, 1, 1]
         w_expanded = weights[:, :, None, None]
-
-        # Step 1: Compute current consensus O* = sum(w_l * O_l)
-        # [B, L, N, D] * [B, L, 1, 1] -> [B, L, N, D] -> sum over L -> [B, N, D]
         consensus = jnp.sum(scale_outputs * w_expanded, axis=1)
-
-        # Step 2: Compute reconstruction error for each scale
-        # error_l = ||O_l - O*||_2
-        # [B, L, N, D] - [B, 1, N, D] -> [B, L, N, D]
         diffs = scale_outputs - consensus[:, None, :, :]
 
-        # L2 norm over spatial and feature dims: [B, L, N, D] -> [B, L]
-        errors = jnp.sqrt(jnp.sum(diffs ** 2, axis=(-2, -1)))
+        # L2 norm with epsilon to prevent sqrt(0) gradient explosion
+        errors = jnp.sqrt(jnp.sum(diffs**2, axis=(-2, -1)) + 1e-8)
 
-        # Step 3: Best response - minimize error by increasing weight for low-error scales
-        # softmax(-error) gives higher weight to lower error
         new_weights = jax.nn.softmax(-errors, axis=-1)
 
-        return new_weights
+        # Stop gradient through iterates - gradients flow only through final aggregation
+        return lax.stop_gradient(new_weights)
 
     # Run fixed number of iterations using fori_loop (JIT-friendly)
     final_weights = lax.fori_loop(
@@ -121,11 +112,9 @@ def nash_best_response_with_temperature(
         w_expanded = weights[:, :, None, None]
         consensus = jnp.sum(scale_outputs * w_expanded, axis=1)
         diffs = scale_outputs - consensus[:, None, :, :]
-        errors = jnp.sqrt(jnp.sum(diffs ** 2, axis=(-2, -1)))
-
-        # Temperature-scaled softmax
+        errors = jnp.sqrt(jnp.sum(diffs**2, axis=(-2, -1)) + 1e-8)
         new_weights = jax.nn.softmax(-errors / temperature, axis=-1)
-        return new_weights
+        return lax.stop_gradient(new_weights)
 
     final_weights = lax.fori_loop(0, num_iterations, iteration_body, init_weights)
     w_expanded = final_weights[:, :, None, None]
@@ -159,7 +148,9 @@ def convex_aggregation(
     return aggregated, weights
 
 
-def compute_sparsity_loss(weights: Float[Array, "... L"], lambda_sparsity: float) -> Float[Array, ""]:
+def compute_sparsity_loss(
+    weights: Float[Array, "... L"], lambda_sparsity: float
+) -> Float[Array, ""]:
     """
     Compute L1 sparsity penalty for aggregation weights.
 

@@ -62,7 +62,9 @@ class MultiscaleAttention(eqx.Module):
             key: PRNG key for initialization.
         """
         if d_model % num_heads != 0:
-            raise ValueError(f"d_model ({d_model}) must be divisible by num_heads ({num_heads})")
+            raise ValueError(
+                f"d_model ({d_model}) must be divisible by num_heads ({num_heads})"
+            )
 
         self.d_model = d_model
         self.num_heads = num_heads
@@ -75,8 +77,7 @@ class MultiscaleAttention(eqx.Module):
 
         # Per-scale Q, K projections
         self.q_projs = tuple(
-            eqx.nn.Linear(d_model, d_model, key=keys[i])
-            for i in range(num_scales)
+            eqx.nn.Linear(d_model, d_model, key=keys[i]) for i in range(num_scales)
         )
         self.k_projs = tuple(
             eqx.nn.Linear(d_model, d_model, key=keys[num_scales + i])
@@ -119,9 +120,8 @@ class MultiscaleAttention(eqx.Module):
         """
         B, N, D = x.shape
 
-        # Project Q, K (scale-specific)
-        q = jax.vmap(self.q_projs[scale_idx])(x)  # [B, N, D]
-        k = jax.vmap(self.k_projs[scale_idx])(x)  # [B, N, D]
+        q = jax.vmap(jax.vmap(self.q_projs[scale_idx]))(x)
+        k = jax.vmap(jax.vmap(self.k_projs[scale_idx]))(x)
 
         # Reshape for multi-head attention
         q = self._reshape_for_attention(q)  # [B, N, H, K]
@@ -137,16 +137,13 @@ class MultiscaleAttention(eqx.Module):
         k = jnp.transpose(k, (0, 2, 1, 3))
         v_heads = jnp.transpose(v_heads, (0, 2, 1, 3))
 
-        # Scaled dot-product attention
-        scale = 1.0 / jnp.sqrt(self.head_dim)
-        scores = jnp.einsum("bhqk,bhmk->bhqm", q, k) * scale  # [B, H, N, N]
+        scale = 1.0 / jnp.sqrt(jnp.array(self.head_dim, dtype=jnp.float32))
+        scores = jnp.einsum("bhqk,bhmk->bhqm", q, k) * scale
 
-        # Causal mask
         if causal:
             mask = jnp.triu(jnp.ones((N, N), dtype=jnp.bool_), k=1)
-            scores = jnp.where(mask, -1e9, scores)
+            scores = jnp.where(mask, jnp.finfo(scores.dtype).min, scores)
 
-        # Softmax and apply to values
         attn_weights = jax.nn.softmax(scores, axis=-1)
         context = jnp.einsum("bhqm,bhmk->bhqk", attn_weights, v_heads)
 
@@ -174,18 +171,13 @@ class MultiscaleAttention(eqx.Module):
         Returns:
             Tuple of attention outputs for each scale.
         """
-        # Compute shared V from scale 0 (original input)
-        v_base = jax.vmap(self.v_proj)(scale_inputs[0])  # [B, N, D]
-
-        # Decompose V to match each scale's length
+        v_base = jax.vmap(jax.vmap(self.v_proj))(scale_inputs[0])
         v_scales = decomposition.decompose_values(v_base)
 
-        # Compute attention per scale
         outputs = []
         for i, (x_l, v_l) in enumerate(zip(scale_inputs, v_scales)):
             attn_out = self._single_scale_attention(x_l, v_l, i, causal)
-            # Apply output projection
-            out_l = jax.vmap(self.o_proj)(attn_out)
+            out_l = jax.vmap(jax.vmap(self.o_proj))(attn_out)
             outputs.append(out_l)
 
         return tuple(outputs)

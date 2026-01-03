@@ -12,7 +12,10 @@ import jax.numpy as jnp
 from jaxtyping import Float, Array
 
 
-@jax.jit
+from functools import partial
+
+
+@partial(jax.jit, static_argnames=["target_len"])
 def nearest_upsample(
     x: Float[Array, "B N D"],
     target_len: int,
@@ -51,7 +54,7 @@ def nearest_upsample(
     return x[:, source_indices, :]
 
 
-@jax.jit
+@partial(jax.jit, static_argnames=["target_len"])
 def nearest_downsample(
     x: Float[Array, "B N D"],
     target_len: int,

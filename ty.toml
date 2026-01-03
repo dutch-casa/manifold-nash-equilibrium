@@ -1,12 +1,12 @@
 [environment]
-python-version = "3.11"
+python = ".venv"
+python-version = "3.13"
+root = ["./src"]
 
 [rules]
-strict = true
-
-[rules.lint]
-# Enforce type annotations on all public APIs
-untyped-def = "error"
-possibly-unbound = "error"
-redundant-cast = "warn"
-unused-ignore = "warn"
+# JAX JIT/vmap/pmap decorators transform function signatures in ways ty can't track.
+# These cause false positives; demote to warnings until JAX stubs improve.
+possibly-unresolved-reference = "warn"
+invalid-argument-type = "warn"
+too-many-positional-arguments = "warn"
+missing-argument = "warn"
