@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from typing import Iterable
 
 import equinox as eqx
 import jax
 import optax
+from flax import struct as flax_struct
 
 from nash_mhc.data.loader import SequenceBatch
 from nash_mhc.models.backbone import MAHALanguageModel
@@ -17,7 +18,7 @@ from nash_mhc.training.metrics import MetricState, aggregate_metrics
 from nash_mhc.types.configs import TrainingConfig
 
 
-@dataclass
+@flax_struct.dataclass
 class TrainState:
     model: MAHALanguageModel
     optimizer: optax.GradientTransformation
@@ -41,14 +42,13 @@ def create_optimizer(config: TrainingConfig) -> optax.GradientTransformation:
         schedules=[warmup, decay],
         boundaries=[config.warmup_steps],
     )
-    
-    # Gradient clipping
+
     chain = [
         optax.clip_by_global_norm(config.max_grad_norm),
         optax.adamw(
             learning_rate=lr_schedule,
             weight_decay=config.weight_decay,
-        )
+        ),
     ]
     return optax.chain(*chain)
 
@@ -72,15 +72,14 @@ def init_train_state(
 
 
 def _prepare_inputs(batch: SequenceBatch) -> tuple:
-    # input: [B, N]
-    # inputs: tokens 0 to N-2
-    # labels: tokens 1 to N-1
     inputs = batch.token_ids[:, :-1]
     labels = batch.token_ids[:, 1:]
     return inputs, labels
 
 
-def train_step(state: TrainState, batch: SequenceBatch) -> tuple[TrainState, LossComponents]:
+def train_step(
+    state: TrainState, batch: SequenceBatch
+) -> tuple[TrainState, LossComponents]:
     """Single JIT-able training step."""
     inputs, labels = _prepare_inputs(batch)
     params, static = eqx.partition(state.model, eqx.is_array)
@@ -88,8 +87,6 @@ def train_step(state: TrainState, batch: SequenceBatch) -> tuple[TrainState, Los
     def loss_fn(filtered_params):
         model = eqx.combine(filtered_params, static)
         logits, aux_loss = model(inputs, causal=True)
-        # logits shape: [B, N-1, V]
-        # labels shape: [B, N-1]
         components = cross_entropy_loss(
             logits,
             labels,
@@ -98,9 +95,13 @@ def train_step(state: TrainState, batch: SequenceBatch) -> tuple[TrainState, Los
         )
         return components.total, components
 
-    (loss_value, components), grads = eqx.filter_value_and_grad(loss_fn, has_aux=True)(params)
+    (loss_value, components), grads = eqx.filter_value_and_grad(loss_fn, has_aux=True)(
+        params
+    )
     updates, new_opt_state = state.optimizer.update(grads, state.opt_state, params)
     new_params = optax.apply_updates(params, updates)
     new_model = eqx.combine(new_params, static)
-    new_state = replace(state, model=new_model, opt_state=new_opt_state, step=state.step + 1)
+    new_state = replace(
+        state, model=new_model, opt_state=new_opt_state, step=state.step + 1
+    )
     return new_state, components

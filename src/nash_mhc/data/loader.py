@@ -10,7 +10,6 @@ import jax.numpy as jnp
 import numpy as np
 from jaxtyping import Int, Array
 
-
 from .datasets import (
     DatasetConfig,
     load_text_dataset,
@@ -95,6 +94,6 @@ def create_grain_dataset(
 def iterate_batches(
     dataset: grain.MapDataset[SequenceBatch],
 ) -> Iterator[SequenceBatch]:
-    """Yield batches from the Grain dataset."""
+    """Yield batches from Grain dataset."""
     for batch in dataset:
         yield batch

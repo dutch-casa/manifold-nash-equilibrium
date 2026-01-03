@@ -29,9 +29,9 @@ from nash_mhc.types.configs import (
 
 @struct.dataclass
 class TrainMetrics(clu_metrics.Collection):
-    loss: clu_metrics.Average.from_output("loss")  # type: ignore[misc]
-    learning_rate: clu_metrics.LastValue.from_output("learning_rate")  # type: ignore[misc]
-    throughput: clu_metrics.Average.from_output("throughput")  # type: ignore[misc]
+    loss: clu_metrics.Average
+    learning_rate: clu_metrics.LastValue
+    throughput: clu_metrics.Average
 
 
 def parse_args() -> argparse.Namespace:
@@ -193,15 +193,14 @@ def main() -> None:
         model, training_config, pad_token_id=hf_tokenizer.pad_token_id
     )
 
+    checkpoint_manager = OrbaxCheckpointManager(args.checkpoint_dir)
+
     if args.resume_from:
         print(f"Resuming from checkpoint: {args.resume_from}")
-        checkpoint_manager = OrbaxCheckpointManager(args.checkpoint_dir)
         state = checkpoint_manager.restore(state)
 
     print("Compiling train step...")
     train_step_jit = jax.jit(train_step)
-
-    checkpoint_manager = OrbaxCheckpointManager(args.checkpoint_dir)
 
     print("Starting training...")
     print(f"Total steps: {training_config.total_steps}")
@@ -212,21 +211,8 @@ def main() -> None:
     step_times = []
     start_time = time.time()
 
-    for step, batch in enumerate(range(training_config.total_steps), start=1):
+    for step_count, batch in enumerate(loader, start=1):
         step_start = time.time()
-
-        try:
-            batch = next(iter(loader))
-        except StopIteration:
-            loader = create_streaming_dataloader(
-                stream_config,
-                LoaderConfig(
-                    batch_size=training_config.batch_size,
-                    shuffle_seed=training_config.seed,
-                ),
-                tokenizer,
-            )
-            batch = next(iter(loader))
 
         state, loss_components = train_step_jit(state, batch)
 
@@ -240,32 +226,32 @@ def main() -> None:
 
         current_lr = training_config.learning_rate
         if training_config.warmup_steps > 0:
-            if step <= training_config.warmup_steps:
-                current_lr = current_lr * (step / training_config.warmup_steps)
+            if step_count <= training_config.warmup_steps:
+                current_lr = current_lr * (step_count / training_config.warmup_steps)
             else:
                 decay_steps = training_config.total_steps - training_config.warmup_steps
-                progress = (step - training_config.warmup_steps) / decay_steps
+                progress = (step_count - training_config.warmup_steps) / decay_steps
                 current_lr = current_lr * 0.5 * (1 + jnp.cos(jnp.pi * progress))
 
         metrics = metrics.merge(
-            TrainMetrics(
-                loss=loss_components.total,
-                learning_rate=float(current_lr),
+            TrainMetrics.single_from_model_output(
+                loss=float(loss_components.total),
+                learning_rate=current_lr,
                 throughput=throughput,
             )
         )
 
-        if step % args.log_interval == 0:
+        if step_count % args.log_interval == 0:
             print(
-                f"Step {step}/{training_config.total_steps} | "
+                f"Step {step_count}/{training_config.total_steps} | "
                 f"loss: {metrics.loss.compute():.4f} | "
                 f"lr: {metrics.learning_rate.compute():.2e} | "
                 f"throughput: {metrics.throughput.compute():.1f} samples/s | "
                 f"step_time: {avg_step_time:.3f}s"
             )
 
-        if step % args.checkpoint_interval == 0:
-            print(f"Saving checkpoint at step {step}...")
+        if step_count % args.checkpoint_interval == 0:
+            print(f"Saving checkpoint at step {step_count}...")
             checkpoint_manager.save(
                 state,
                 metrics={
@@ -279,7 +265,14 @@ def main() -> None:
     print(f"\nTraining complete in {total_time:.1f}s")
     print(f"Final metrics: {metrics.compute()}")
 
-    checkpoint_manager.save(state)
+    checkpoint_manager.save(
+        state,
+        metrics={
+            "loss": float(metrics.loss.compute()),
+            "learning_rate": float(metrics.learning_rate.compute()),
+            "throughput": float(metrics.throughput.compute()),
+        },
+    )
     checkpoint_manager.wait_until_finished()
     checkpoint_manager.close()
 
