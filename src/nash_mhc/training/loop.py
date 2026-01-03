@@ -2,23 +2,19 @@
 
 from __future__ import annotations
 
-import time
-from dataclasses import replace
-from typing import Iterable
+from dataclasses import replace as dc_replace
 
 import equinox as eqx
-import jax
 import optax
-from flax import struct as flax_struct
+from flax import struct
 
 from nash_mhc.data.loader import SequenceBatch
 from nash_mhc.models.backbone import MAHALanguageModel
 from nash_mhc.training.loss import LossComponents, cross_entropy_loss
-from nash_mhc.training.metrics import MetricState, aggregate_metrics
 from nash_mhc.types.configs import TrainingConfig
 
 
-@flax_struct.dataclass
+@struct.dataclass
 class TrainState:
     model: MAHALanguageModel
     optimizer: optax.GradientTransformation
@@ -101,7 +97,7 @@ def train_step(
     updates, new_opt_state = state.optimizer.update(grads, state.opt_state, params)
     new_params = optax.apply_updates(params, updates)
     new_model = eqx.combine(new_params, static)
-    new_state = replace(
+    new_state = dc_replace(
         state, model=new_model, opt_state=new_opt_state, step=state.step + 1
     )
     return new_state, components
